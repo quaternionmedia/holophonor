@@ -735,6 +735,9 @@ public:
   inline int GetCurPulseIndex() { return curpulseindex; };
   inline Pulse *GetPulseByIndex(int pulseindex) { return pulses[pulseindex]; };
 
+  // recount how many beats are in the active loops of the current pulse
+  void RecountPulse();
+
   // Deletes the specified pulse, stopping striping
   void DeletePulse(int pulseindex);
 

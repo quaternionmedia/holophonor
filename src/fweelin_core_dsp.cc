@@ -441,7 +441,7 @@ void Pulse::SetMIDIClock (char start) {
 
 int Pulse::ExtendLongCount (long nbeats, char endjustify) {
   if (nbeats > 0) {
-    int lc_new_len = math_lcm(lc_len,(int) nbeats);
+    int lc_new_len = MAX(lc_len,(int) nbeats);
 
     // Justify position relative to end of phrase (when expanding)
     if (endjustify && lc_new_len > lc_len) {

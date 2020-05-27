@@ -1933,6 +1933,7 @@ void LoopManager::DeleteLoop (int index) {
   }
 
   UnlockLoops();
+  RecountPulse();
 }
 
 void LoopManager::UpdateLoopLists_ItemAdded (int l_idx) {
@@ -2117,6 +2118,7 @@ void LoopManager::Activate (int index, char shot, float vol, nframes_t ofs,
       status[index] = T_LS_Playing;
     }
           
+    RecountPulse();
     // **DEBUG** Show long count based on all playing loops
     /*
     int lcm = 1;
@@ -2138,7 +2140,7 @@ void LoopManager::Deactivate (int index) {
     printf("Nothing happening on index %d to deactivate\n",index);
     return;
   }
-  
+
   // If we recorded something new to this index, store it in the map
   if (status[index] == T_LS_Recording && 
       app->getTMAP()->GetMap(index) == 0) {
@@ -2189,7 +2191,22 @@ void LoopManager::Deactivate (int index) {
     Processor *p = plist[index];
     plist[index] = 0;
     app->getRP()->DelChild(p);
-    status[index] = T_LS_Off;    
+    status[index] = T_LS_Off;
+  }
+  RecountPulse();
+}
+
+void LoopManager::RecountPulse() {
+  int max = 1;
+  for (int i = 0; i < app->getTMAP()->GetMapSize(); i++) {
+    if (status[i] == T_LS_Playing) {
+      Loop *l = app->getTMAP()->GetMap(i);
+      max = MAX(max, l->nbeats);
+    }
+  }
+  if (curpulseindex != -1) {
+    GetCurPulse()->SetLongCount(max);
+    printf("Pulse len: %d\n", max);
   }
 }
 

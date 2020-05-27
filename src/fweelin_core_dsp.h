@@ -432,7 +432,8 @@ public:
 
   int ExtendLongCount (long nbeats, char endjustify);
   void ResetLongCount() { lc_len = 1; };
-  
+  void SetLongCount(long nbeats) { lc_len = nbeats; };
+
   nframes_t len, // Length of one revolution of this pulse in samples
     curpos;      // Current position in samples into this pulse
   
