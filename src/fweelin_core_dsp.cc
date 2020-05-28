@@ -457,6 +457,19 @@ int Pulse::ExtendLongCount (long nbeats, char endjustify) {
   return lc_len;
 };
 
+void Pulse::SetLongCount(long nbeats) {
+  if (nbeats > 0) {
+    int lc_end_delta = lc_len - lc_cur;
+    if (nbeats > lc_len) {
+      lc_cur = nbeats;
+    } else {
+      if (nbeats < lc_len) {
+      lc_cur = nbeats;
+      }
+    }
+      lc_len = nbeats;
+  }
+}
 // TODO
 //
 // Please note that all sync is done with a granularity of the audio period 
