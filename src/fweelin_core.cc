@@ -2099,9 +2099,15 @@ void LoopManager::Activate (int index, char shot, float vol, nframes_t ofs,
   } else {
     // A loop exists at that index
     
-    if (lp->pulse != 0)
-      lp->pulse->ExtendLongCount(lp->nbeats,1);
-
+    if (lp->pulse != 0) {
+      if (lp->pulse->GetPct() <= 0.5) {
+        printf("loop[%d] syncing now \n", index);
+        lp->pulse->ExtendLongCount(lp->nbeats,0);
+      } else {
+        printf("loop[%d] syncing next beat \n", index);
+        lp->pulse->ExtendLongCount(lp->nbeats,1);
+      }
+    }
     if (overdub) {
       // Overdub
       float *inputvol = app->getRP()->GetInputVolumePtr(); // Get input vol from main
