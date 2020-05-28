@@ -2197,16 +2197,16 @@ void LoopManager::Deactivate (int index) {
 }
 
 void LoopManager::RecountPulse() {
-  int max = 1;
-  for (int i = 0; i < app->getTMAP()->GetMapSize(); i++) {
-    if (status[i] == T_LS_Playing) {
-      Loop *l = app->getTMAP()->GetMap(i);
-      max = MAX(max, l->nbeats);
+  if (GetCurPulse() > 0) {
+    int max = 1;
+    for (int i = 0; i < app->getTMAP()->GetMapSize(); i++) {
+      if (status[i] == T_LS_Playing) {
+        Loop *l = app->getTMAP()->GetMap(i);
+        max = MAX(max, l->nbeats);
+      }
     }
-  }
-  if (curpulseindex != -1) {
-    GetCurPulse()->SetLongCount(max);
-    printf("Pulse len: %d\n", max);
+  printf("Pulse len: %d\n", max);
+  GetCurPulse()->SetLongCount(max);
   }
 }
 
