@@ -2116,9 +2116,9 @@ void LoopManager::Activate (int index, char shot, float vol, nframes_t ofs,
       app->getRP()->AddChild(plist[index] = 
                              new PlayProcessor(app,lp,vol,ofs));
       status[index] = T_LS_Playing;
+      RecountPulse();
     }
           
-    RecountPulse();
     // **DEBUG** Show long count based on all playing loops
     /*
     int lcm = 1;
