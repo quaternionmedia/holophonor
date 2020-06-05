@@ -446,7 +446,7 @@ int Pulse::ExtendLongCount (long nbeats, char endjustify) {
     // Justify position relative to end of phrase (when expanding)
     if (endjustify) {
       int lc_end_delta = lc_len - lc_cur;
-      if (lc_new_len > lc_len) {
+      if (lc_new_len >= lc_len) {
         // printf("CUR %d LEN %d\n",lc_cur,lc_len);
         lc_cur = lc_new_len - lc_end_delta; // Distance from end of phrase is preserved
         // printf("EDELTA %d NEWCUR %d NEWLEN %d\n",lc_end_delta,lc_cur,lc_new_len);
@@ -469,7 +469,9 @@ void Pulse::SetLongCount(long nbeats) {
       lc_cur = nbeats;
     } else {
       if (nbeats < lc_len) {
-      lc_cur = nbeats;
+        if (nbeats > lc_cur) {
+          lc_cur = nbeats;
+        }
       }
     }
       lc_len = nbeats;
