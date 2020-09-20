@@ -2107,6 +2107,9 @@ void LoopManager::Activate (int index, char shot, float vol, nframes_t ofs,
         printf("loop[%d] syncing next beat \n", index);
         lp->pulse->ExtendLongCount(lp->nbeats,1);
       }
+    } else {
+      // there is no pulse yet. make one!
+      SelectPulse(0);
     }
     if (overdub) {
       // Overdub
