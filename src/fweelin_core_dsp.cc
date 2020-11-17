@@ -475,6 +475,9 @@ void Pulse::SetLongCount(long nbeats) {
       }
     }
       lc_len = nbeats;
+      if (lc_cur == lc_len) {
+        lc_cur--;
+      }
       printf("set lc_len = %d, lc_cur = %d\n", lc_len, lc_cur);
   }
 }
