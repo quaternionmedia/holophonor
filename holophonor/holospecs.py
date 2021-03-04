@@ -10,3 +10,7 @@ class Holophonor:
     @holospec
     def triggerLoop(self, loop: int, volume: int):
         """trigger loop at volume"""
+    
+    @holospec
+    def close(self):
+        """close the connection"""

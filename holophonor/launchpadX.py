@@ -22,6 +22,10 @@ class LaunchpadX(Holophonor):
         # switch to / from programming / Live mode
         self.midi.send_message([240, 0, 32, 41, 2, 12, 14, 0 if self.live else 1, 247])
         self.live = not self.live
+    @holoimpl    
+    def close(self):
+        if self.live:
+            self.toggleLive()
     @holoimpl
     def triggerLoop(self, loop, volume):
         self.midi.send_message([NOTE_ON, self.map[loop - 1], volume])

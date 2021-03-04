@@ -6,9 +6,14 @@ from pluggy import PluginManager
 
 def main():
     pm = get_plugin_manager()
-    while True:
-        pm.hook.triggerLoop(loop=1, volume=127)
-        input()
+    try:
+        while True:
+            pm.hook.triggerLoop(loop=1, volume=127)
+            input()
+    except Exception as e:
+        print(e)
+    finally:
+        pm.hook.close()
 
 def get_plugin_manager():
     pm = PluginManager('holophonor')
