@@ -5,11 +5,8 @@ from rtmidi.midiconstants import NOTE_ON
 
 
 class LaunchpadX(Holophonor):
-    def __init__(self, port, plugins=[]):
-        super().__init__()
-        self.port = port
-        self.midi, self.name = open_midioutput(self.port, client_name='holo->launchpadX')
-        self.plugins = plugins
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.live = False
         self.toggleLive()
         self.map = []
@@ -22,10 +19,12 @@ class LaunchpadX(Holophonor):
         # switch to / from programming / Live mode
         self.midi.send_message([240, 0, 32, 41, 2, 12, 14, 0 if self.live else 1, 247])
         self.live = not self.live
+    
     @holoimpl    
     def close(self):
-        if self.live:
-            self.toggleLive()
+        # exit programming mode
+        self.midi.send_message([240, 0, 32, 41, 2, 12, 14, 0, 247])
+    
     @holoimpl
     def triggerLoop(self, loop, volume):
         self.midi.send_message([NOTE_ON, self.map[loop - 1], volume])

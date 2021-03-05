@@ -18,8 +18,8 @@ def main():
 def get_plugin_manager():
     pm = PluginManager('holophonor')
     pm.add_hookspecs(Holophonor)
-    pm.register(Fweelin('FreeWheeling:FreeWheeling IN 1'))
-    pm.register(LaunchpadX('Launchpad X:Launchpad X MIDI 2'))
+    pm.register(Fweelin(pm.hook, 'FreeWheeling:FreeWheeling IN 1'))
+    pm.register(LaunchpadX(pm.hook, 'Launchpad X:Launchpad X MIDI 2'))
 
     return pm
 
