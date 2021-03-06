@@ -4,10 +4,10 @@ from rtmidi.midiutil import open_midioutput
 holospec = HookspecMarker('holophonor')
 
 class Holophonor:
-    def __init__(self, hook, port, plugins=[]):
+    def __init__(self, hook, port, client_name='holo', plugins=[], **kwargs):
         self.hook = hook
         self.port = port
-        self.midi, self.name = open_midioutput(self.port, client_name='holo->fweelin')
+        self.midi, self.name = open_midioutput(self.port, client_name=client_name)
         self.plugins = plugins
         self.loops = [None]*32
         self.pulse = False

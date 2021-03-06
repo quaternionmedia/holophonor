@@ -22,7 +22,7 @@ class LaunchpadX(Holophonor):
             for x in range(8):
                 self.map.append(n + x)
             n -= 10
-        self.input, self.input_name = open_midiinput(self.port)
+        self.input, self.input_name = open_midiinput(self.port, client_name='launchpad->holo')
         self.input.set_callback(self)
         self.clear()
     
