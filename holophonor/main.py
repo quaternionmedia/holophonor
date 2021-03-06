@@ -8,7 +8,6 @@ def main():
     pm = get_plugin_manager()
     try:
         while True:
-            pm.hook.triggerLoop(loop=1, volume=127)
             input()
     except Exception as e:
         print(e)
