@@ -35,10 +35,6 @@ class LaunchpadX(Holophonor):
         # exit programming mode
         self.midi.send_message([240, 0, 32, 41, 2, 12, 14, 0, 247])
     
-    # @holoimpl
-    # def triggerLoop(self, loop, volume):
-    #     self.midi.send_message([NOTE_ON, self.map[loop], volume])
-    # 
     @holoimpl
     def recordLoop(self, loop):
         self.midi.send_message([NOTE_ON | 0x2, self.map[loop], RECORDING])
@@ -48,10 +44,21 @@ class LaunchpadX(Holophonor):
     def playLoop(self, loop, volume):
         self.midi.send_message([NOTE_ON | 0x2, self.map[loop], GREEN[volume >> 4]])
         self.loops[loop] = volume
+    
     @holoimpl
     def stopLoop(self, loop):
         self.midi.send_message([NOTE_ON, self.map[loop], STOPPED])
         self.loops[loop] = 0
+    
+    @holoimpl
+    def eraseLoop(self, loop):
+        self.midi.send_message([NOTE_ON, self.map[loop], ERASE])
+        self.loops[loop] = None
+    
+    @holoimpl
+    def clearLoop(self, loop):
+        self.midi.send_message([NOTE_ON, self.map[loop], EMPTY])
+    
     # @holoimpl
     # def startLoopInCutMode(self, loop, volume):
     #     self.midi.send_message()
