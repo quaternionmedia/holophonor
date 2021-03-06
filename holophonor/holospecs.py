@@ -104,10 +104,17 @@ class Holophonor:
         '''set drum pad patch'''
     
     @holospec
-    def setDrumBank(self, patch: int):
+    def setDrumBank(self, bank: int):
         '''set drum pad bank'''
     
-
+    @holospec
+    def playNote(self, note: tuple):
+        '''play a synth note'''
+    
+    @holospec
+    def clearNote(self, note: tuple):
+        '''clear button from note'''
+    
     @holospec
     def close(self):
         '''close the connection'''
