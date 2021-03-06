@@ -152,8 +152,8 @@ class LaunchpadX(Holophonor):
                 i = DRUM_PATCHES.index(message[1])
                 self.hook.setDrumPatch(i)
             elif message[1] in MUTES and message[2]:
-                n = 15 - message[1]
-                self.hook.toggleMute(n)
+                n = message[1] - 15
+                self.hook.toggleMute(channel=n)
             else:
                 # no matching rule found for note
                 pass
