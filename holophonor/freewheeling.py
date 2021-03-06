@@ -20,4 +20,18 @@ class Fweelin(Holophonor):
     def eraseLoop(self, loop: int):
         self.playLoop(loop, 127)
     
-    
+    @holoimpl
+    def toggleShift(self):
+        self.midi.send_message([CONTROL_CHANGE, 98, 0 if self.shift else 127])
+        self.shift = not self.shift
+
+    @holoimpl
+    def toggleCut(self):
+        self.midi.send_message([CONTROL_CHANGE, 96, 0 if self.cut else 127])
+        self.cut = not self.cut
+
+    @holoimpl
+    def toggleOverdub(self):
+        self.midi.send_message([CONTROL_CHANGE, 97, 0 if self.overdub else 127])
+        self.overdub = not self.overdub
+
