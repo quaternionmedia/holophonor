@@ -35,21 +35,23 @@ class LaunchpadX(Holophonor):
         # exit programming mode
         self.midi.send_message([240, 0, 32, 41, 2, 12, 14, 0, 247])
     
-    @holoimpl
-    def triggerLoop(self, loop, volume):
-        self.midi.send_message([NOTE_ON, self.map[loop], volume])
-    
+    # @holoimpl
+    # def triggerLoop(self, loop, volume):
+    #     self.midi.send_message([NOTE_ON, self.map[loop], volume])
+    # 
     @holoimpl
     def recordLoop(self, loop):
         self.midi.send_message([NOTE_ON | 0x2, self.map[loop], RECORDING])
+        self.loops[loop] = 0
     
     @holoimpl
     def playLoop(self, loop, volume):
         self.midi.send_message([NOTE_ON | 0x2, self.map[loop], GREEN[volume >> 4]])
+        self.loops[loop] = volume
     @holoimpl
     def stopLoop(self, loop):
         self.midi.send_message([NOTE_ON, self.map[loop], STOPPED])
-    
+        self.loops[loop] = 0
     # @holoimpl
     # def startLoopInCutMode(self, loop, volume):
     #     self.midi.send_message()
@@ -69,9 +71,13 @@ class LaunchpadX(Holophonor):
                             # cut mode
                             if loop in (0, None):
                                 self.hook.startLoopInCutMode(loop=l, volume=message[2])
-                            # if no existing loop, we are now recording.
-                            # else, store the volume info
-                            loop = 0 if loop == None else message[2]
+                            if loop == None:
+                                # no existing loop, we are now recording.
+                                self.hook.recordLoop(loop=l, volume=message[2])
+                            else:
+                                # loop was paused. Play now
+                                self.hook.playLoop(loop=l, volume=message[2])
+                            
                         else:
                             # normal (uncut) mode
                             if loop == None:
@@ -84,6 +90,14 @@ class LaunchpadX(Holophonor):
                                 self.hook.playLoop(loop=l, volume=message[2])
                             elif loop == 0:
                                 # loop stopped (or recording)
+                                if self.overdub:
+                                    # overdub loop
+                                    self.hook.overdubLoop(loop=l)
+                                else:
+                                    # start playing
+                                    self.hook.playLoop(loop=l, volume=message[2])
+                            else:
+                                # loop is playing
                                 if self.overdub:
                                     # overdub loop
                                     self.hook.overdubLoop(loop=l)
