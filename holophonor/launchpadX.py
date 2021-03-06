@@ -325,11 +325,13 @@ class LaunchpadX(Holophonor):
                     if message[1] == UP_ARROW and message[2] == 127:
                         # arrow up button
                         # drum bank increment
-                        self.hook.setDrumBank(bank=min(self.drum_bank + 1, 3))
+                        # not attached to hook
+                        # multiple devices can have seperate local banks
+                        self.setDrumBank(bank=min(self.drum_bank + 1, 3))
                     elif message[1] == DOWN_ARROW and message[2] == 127:
                         # arrow down button
                         # drum bank decrement
-                        self.hook.setDrumBank(bank=max(self.drum_bank - 1, -1))
+                        self.setDrumBank(bank=max(self.drum_bank - 1, -1))
                     elif message[1] == NOTE_BUTTON:
                         # note button
                         # momentary cut mode - normal on release
