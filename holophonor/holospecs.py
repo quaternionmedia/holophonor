@@ -10,6 +10,7 @@ class Holophonor:
         self.midi, self.name = open_midioutput(self.port, client_name='holo->fweelin')
         self.plugins = plugins
         self.loops = [None]*32
+        self.pulse = False
         self.scenes = [None]*8
         self.current_scene = None
         self.shift = False
