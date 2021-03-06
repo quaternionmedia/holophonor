@@ -6,9 +6,9 @@ SCENES = list(range(8, 121, 16))
 FUNCTIONS = list(range(104, 112))
 DRUMS = [i for i in chain.from_iterable([list(range(x, x+4)) for x in list(range(64, 113, 16))])]
 
-DRUM_BANKS = [69, 79, 35, 15, 59]
+DRUM_BANKS = [45, 62, 63, 47, 13]
 DRUM_PATCHES = list(range(100, 104))
-DRUM_PATCH_COLORS = [32, 24, 25, 56]
+DRUM_PATCH_COLORS = DRUM_BANKS[:-1]
 FX = [i for i in chain.from_iterable([list(range(x, x+4)) for x in list(range(68, 113, 16))])]
 MUTES = list(range(116, 120))
 
@@ -60,3 +60,38 @@ class LaunchpadS(LaunchpadX):
             self.pulse = True
             self.midi.send_message([CONTROL_CHANGE, 95, PULSE])
             self.midi.send_message([CONTROL_CHANGE, 99, PULSE])
+    
+    @holoimpl
+    def recallScene(self, scene: int):
+        # need to overwrite LaunchpadX implementation
+        # because scene light can't recieve flashing signal
+        if self.current_scene != None:
+            self.midi.send_message([CONTROL_CHANGE, SCENES[self.current_scene], STOPPED])
+        self.current_scene = scene
+        self.midi.send_message([CONTROL_CHANGE, SCENES[scene], GREEN[-1]])
+        s = self.scenes[scene]
+        for l, b in enumerate(self.map):
+            if self.loops[l] != None:
+                # loop exists
+                if s[l] != self.loops[l]:
+                    # loop needs to be changed
+                    if s[l] in (0, None):
+                        if self.loops[l] > 0:
+                            # stop loop
+                            self.stopLoop(l)
+                            self.loops[l] = 0
+                    elif s[l] != None and self.loops[l] == 0:
+                        # start loop
+                        self.playLoop(l, s[l])
+                    else:
+                        # change the volume
+                        self.playLoop(l, s[l])
+                if s[l] in (0, None):
+                    self.stopLoop(l)
+                else:
+                    self.playLoop(l, s[l])
+    
+    @holoimpl
+    def close(self):
+        # no need to exit live mode
+        pass
