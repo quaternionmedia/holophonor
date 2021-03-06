@@ -59,9 +59,31 @@ class LaunchpadX(Holophonor):
     def clearLoop(self, loop):
         self.midi.send_message([NOTE_ON, self.map[loop], EMPTY])
     
+    @holoimpl
+    def startLoopInCutMode(self, loop, volume):
+        self.playLoop(loop, volume)
+
+    @holoimpl
+    def overdubLoop(self, loop: int):
+        self.midi.send_message([NOTE_ON, self.map[loop], RECORDING])
+        self.loops[loop] = -1
+
+    @holoimpl
+    def toggleShift(self):
+        self.midi.send_message([CONTROL_CHANGE, 98, 0 if self.shift else ERASE])
+        self.shift = not self.shift
+
+    @holoimpl
+    def toggleCut(self):
+        self.midi.send_message([CONTROL_CHANGE, 96, 0 if self.cut else CUT])
+        self.cut = not self.cut
+
+    @holoimpl
+    def toggleOverdub(self):
+        self.midi.send_message([CONTROL_CHANGE, 97, 0 if self.overdub else RECORDING])
+        self.overdub = not self.overdub
+
     # @holoimpl
-    # def startLoopInCutMode(self, loop, volume):
-    #     self.midi.send_message()
     def __call__(self, event, data=None):
         message, deltatime = event
         print(message)
