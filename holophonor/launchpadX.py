@@ -50,6 +50,8 @@ class LaunchpadX(Holophonor):
     def clear(self):
         for i in self.map:
             self.midi.send_message([NOTE_ON, i, EMPTY])
+        for i in SCENES:
+            self.midi.send_message([NOTE_ON, i, EMPTY])
         for i in range(len(self.mutes)):
             self.midi.send_message([NOTE_ON, i + 15, EMPTY if self.mutes[i] else RECORDING])
         self.midi.send_message([NOTE_ON, 99, 1])
