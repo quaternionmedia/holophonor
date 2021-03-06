@@ -1,5 +1,5 @@
 from holophonor.holospecs import Holophonor
-from holophonor.lib import Fweelin
+from holophonor.freewheeling import Fweelin
 from holophonor.launchpadX import LaunchpadX
 from pluggy import PluginManager
 
