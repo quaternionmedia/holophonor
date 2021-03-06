@@ -132,6 +132,7 @@ class LaunchpadX(Holophonor):
     @holoimpl
     def eraseScene(self, scene: int):
         self.midi.send_message([NOTE_ON, SCENES[scene], ERASE])
+        self.scenes[scene] = None
     
     @holoimpl
     def clearScene(self, scene: int):
@@ -282,8 +283,9 @@ class LaunchpadX(Holophonor):
                         else:
                             # store scene
                             self.hook.storeScene(scene=s)
-                elif self.scenes[s] == None:
-                        # scene button released after erase
+                else:
+                    # scene button released
+                    if self.scenes[s] == None:
                         self.hook.clearScene(scene=s)
             elif message[1] in FUNCTIONS:
                 if message[1] == 98:
@@ -321,3 +323,6 @@ class LaunchpadX(Holophonor):
                         # tap-pulse
                         if message[2] == 127:
                             self.hook.tapPulse()
+                        elif self.pulse == False:
+                            # this also clears the ERASE color from the Session button if shift mode is released first
+                            self.hook.clearPulse()
