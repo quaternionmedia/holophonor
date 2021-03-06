@@ -8,7 +8,8 @@ SCENES = [89, 79, 69, 59, 49, 39, 29, 19]
 FUNCTIONS = [91, 92, 93, 94 , 95, 96, 97, 98]
 DRUMS = [11, 12, 13, 14, 21, 22, 23, 24, 31, 32, 33, 34, 41, 42, 43, 44]
 DRUM_BANKS = [69, 79, 35, 15, 59]
-DRUM_PATCHES = [32, 24, 25, 56]
+DRUM_PATCHES = [25, 26, 27, 28]
+DRUM_PATCH_COLORS = [32, 24, 25, 56]
 FX = [35, 36, 37, 38, 45, 46, 47, 48]
 MUTES = [15, 16, 17, 18]
 
@@ -26,6 +27,7 @@ class LaunchpadX(Holophonor):
         self.input, self.input_name = open_midiinput(self.port, client_name='launchpad->holo')
         self.input.set_callback(self)
         self.drum_bank = 0
+        self.drum_patch = 0
         self.clear()
         self.lightDrums()
     
@@ -123,6 +125,13 @@ class LaunchpadX(Holophonor):
     def toggleMute(self, channel: int):
         self.midi.send_message([NOTE_ON, channel + 15, RECORDING if self.mutes[channel] else EMPTY])
         self.mutes[channel] = not self.mutes[channel]
+
+    @holoimpl
+    def setDrumPatch(self, patch: int):
+        self.midi.send_message([NOTE_ON, DRUM_PATCHES[patch], DRUM_PATCH_COLORS[patch]])
+        for button in set(DRUM_PATCHES) - {DRUM_PATCHES[patch]}:
+            self.midi.send_message([NOTE_ON, button, EMPTY])
+        self.drum_patch = patch
 
     @holoimpl
     def setDrumBank(self, bank: int):
