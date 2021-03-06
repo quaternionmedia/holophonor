@@ -118,8 +118,9 @@ class LaunchpadX(Holophonor):
                 else:
                     # note off
                     # button released
-                    # if we erased the loop, clear the color
-                    self.hook.clearLoop(loop=l)
+                    if self.loops[l] == None:
+                        # if we erased the loop, clear the color
+                        self.hook.clearLoop(loop=l)
             elif message[1] in DRUMS:
                 self.hook.playMidi([NOTE_ON | 0x9, 36 + DRUMS.index(message[1]) + self.drum_bank*16, message[2]])
             elif message[1] in FX and message[2]:
