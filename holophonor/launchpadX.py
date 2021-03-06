@@ -24,6 +24,7 @@ class LaunchpadX(Holophonor):
             n -= 10
         self.input, self.input_name = open_midiinput(self.port)
         self.input.set_callback(self)
+        self.clear()
     
     def toggleLive(self):
         # switch to / from programming / Live mode
@@ -33,6 +34,8 @@ class LaunchpadX(Holophonor):
     def clear(self):
         for i in self.map:
             self.midi.send_message([NOTE_ON, i, EMPTY])
+        for i in range(len(self.mutes)):
+            self.midi.send_message([NOTE_ON, i + 15, EMPTY if self.mutes[i] else RECORDING])
 
     @holoimpl    
     def close(self):
@@ -100,6 +103,15 @@ class LaunchpadX(Holophonor):
     def clearPulse(self):
         self.midi.send_message([CONTROL_CHANGE, 95, EMPTY])
     
+    @holoimpl
+    def tapPulse(self):
+        self.midi.send_message([CONTROL_CHANGE, 95, TAP])
+
+    @holoimpl
+    def toggleMute(self, channel: int):
+        self.midi.send_message([NOTE_ON, channel + 15, RECORDING if self.mutes[channel] else EMPTY])
+        self.mutes[channel] = not self.mutes[channel]
+
     def __call__(self, event, data=None):
         message, deltatime = event
         print(message)
