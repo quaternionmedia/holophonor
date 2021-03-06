@@ -42,6 +42,7 @@ class LaunchpadX(Holophonor):
             self.midi.send_message([NOTE_ON, i, EMPTY])
         for i in range(len(self.mutes)):
             self.midi.send_message([NOTE_ON, i + 15, EMPTY if self.mutes[i] else RECORDING])
+        self.midi.send_message([NOTE_ON, 99, 1])
     
     def lightDrums(self):
         for i in DRUMS:
@@ -69,6 +70,7 @@ class LaunchpadX(Holophonor):
         if not self.pulse:
             self.pulse = True
             self.midi.send_message([CONTROL_CHANGE, 95, PULSE])
+            self.midi.send_message([CONTROL_CHANGE, 99, PULSE])
     
     @holoimpl
     def stopLoop(self, loop):
@@ -162,6 +164,7 @@ class LaunchpadX(Holophonor):
         self.pulse = False
         self.loops = [None]*len(self.map)
         self.scenes = [None]*len(self.scenes)
+        self.midi.send_message([NOTE_ON, 99, 1])
     
     @holoimpl
     def clearPulse(self):
@@ -169,7 +172,11 @@ class LaunchpadX(Holophonor):
     
     @holoimpl
     def tapPulse(self):
-        self.midi.send_message([CONTROL_CHANGE, 95, TAP])
+        self.midi.send_message([CONTROL_CHANGE, 95, TAP if self.tap else PULSE])
+        self.tap = not self.tap
+        if not self.tap and not self.pulse:
+            self.pulse = True
+            self.midi.send_message([NOTE_ON, 99, PULSE])
     
     @holoimpl
     def toggleMute(self, channel: int):
