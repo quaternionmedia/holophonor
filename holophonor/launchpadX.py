@@ -30,6 +30,10 @@ class LaunchpadX(Holophonor):
         self.midi.send_message([240, 0, 32, 41, 2, 12, 14, 0 if self.live else 1, 247])
         self.live = not self.live
     
+    def clear(self):
+        for i in self.map:
+            self.midi.send_message([NOTE_ON, i, EMPTY])
+
     @holoimpl    
     def close(self):
         # exit programming mode
@@ -44,6 +48,9 @@ class LaunchpadX(Holophonor):
     def playLoop(self, loop, volume):
         self.midi.send_message([NOTE_ON | 0x2, self.map[loop], GREEN[volume >> 4]])
         self.loops[loop] = volume
+        if not self.pulse:
+            self.pulse = True
+            self.midi.send_message([CONTROL_CHANGE, 95, PULSE])
     
     @holoimpl
     def stopLoop(self, loop):
@@ -86,6 +93,8 @@ class LaunchpadX(Holophonor):
     @holoimpl
     def deletePulse(self):
         self.midi.send_message([CONTROL_CHANGE, 95, ERASE])
+        self.clear()
+        self.pulse = False
     
     @holoimpl
     def clearPulse(self):
