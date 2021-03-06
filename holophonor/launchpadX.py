@@ -13,6 +13,16 @@ DRUM_PATCH_COLORS = [32, 24, 25, 56]
 FX = [35, 36, 37, 38, 45, 46, 47, 48]
 MUTES = [15, 16, 17, 18]
 
+UP_ARROW = 91
+DOWN_ARROW = 92
+LEFT_ARROW = 93
+RIGHT_ARROW = 94
+SESSION_BUTTON = 95
+NOTE_BUTTON = 96
+CUSTOM_BUTTON = 97
+CAPTURE_MIDI_BUTTON = 98
+
+
 class LaunchpadX(Holophonor):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -24,11 +34,11 @@ class LaunchpadX(Holophonor):
             for x in range(8):
                 self.map.append(n + x)
             n -= 10
-        self.input, self.input_name = open_midiinput(self.port, client_name='launchpad->holo')
+        self.input, self.input_name = open_midiinput(self.port, client_name='launchpadX->holo')
         self.input.set_callback(self)
         self.drum_bank = 0
         self.drum_patch = 0
-        self.fx = [False]*12
+        self.fx = [False]*8
         self.clear()
         self.lightDrums()
     
@@ -47,8 +57,8 @@ class LaunchpadX(Holophonor):
     def lightDrums(self):
         for i in DRUMS:
             self.midi.send_message([NOTE_ON, i, DRUM_BANKS[self.drum_bank]])
-        self.midi.send_message([NOTE_ON, 91, DRUM_BANKS[min(self.drum_bank + 1, 3)]])
-        self.midi.send_message([NOTE_ON, 92, DRUM_BANKS[max(self.drum_bank - 1, -1)]])
+        self.midi.send_message([NOTE_ON, UP_ARROW, DRUM_BANKS[min(self.drum_bank + 1, 3)]])
+        self.midi.send_message([NOTE_ON, DOWN_ARROW, DRUM_BANKS[max(self.drum_bank - 1, -1)]])
     
     def lightButton(self, note):
         self.midi.send_message(note)
@@ -69,7 +79,7 @@ class LaunchpadX(Holophonor):
         self.loops[loop] = volume
         if not self.pulse:
             self.pulse = True
-            self.midi.send_message([CONTROL_CHANGE, 95, PULSE])
+            self.midi.send_message([CONTROL_CHANGE, SESSION_BUTTON, PULSE])
             self.midi.send_message([CONTROL_CHANGE, 99, PULSE])
     
     @holoimpl
@@ -144,22 +154,22 @@ class LaunchpadX(Holophonor):
     
     @holoimpl
     def toggleShift(self):
-        self.midi.send_message([CONTROL_CHANGE, 98, 0 if self.shift else ERASE])
+        self.midi.send_message([CONTROL_CHANGE, CAPTURE_MIDI_BUTTON, 0 if self.shift else ERASE])
         self.shift = not self.shift
     
     @holoimpl
     def toggleCut(self):
-        self.midi.send_message([CONTROL_CHANGE, 96, 0 if self.cut else CUT])
+        self.midi.send_message([CONTROL_CHANGE, NOTE_BUTTON, 0 if self.cut else CUT])
         self.cut = not self.cut
     
     @holoimpl
     def toggleOverdub(self):
-        self.midi.send_message([CONTROL_CHANGE, 97, 0 if self.overdub else RECORDING])
+        self.midi.send_message([CONTROL_CHANGE, CUSTOM_BUTTON, 0 if self.overdub else RECORDING])
         self.overdub = not self.overdub
     
     @holoimpl
     def deletePulse(self):
-        self.midi.send_message([CONTROL_CHANGE, 95, ERASE])
+        self.midi.send_message([CONTROL_CHANGE, SESSION_BUTTON, ERASE])
         self.clear()
         self.pulse = False
         self.loops = [None]*len(self.map)
@@ -168,11 +178,11 @@ class LaunchpadX(Holophonor):
     
     @holoimpl
     def clearPulse(self):
-        self.midi.send_message([CONTROL_CHANGE, 95, EMPTY])
+        self.midi.send_message([CONTROL_CHANGE, SESSION_BUTTON, EMPTY])
     
     @holoimpl
     def tapPulse(self):
-        self.midi.send_message([CONTROL_CHANGE, 95, TAP if self.tap else PULSE])
+        self.midi.send_message([CONTROL_CHANGE, SESSION_BUTTON, TAP if self.tap else PULSE])
         self.tap = not self.tap
         if not self.tap and not self.pulse:
             self.pulse = True
@@ -296,12 +306,12 @@ class LaunchpadX(Holophonor):
                     if self.scenes[s] == None:
                         self.hook.clearScene(scene=s)
             elif message[1] in FUNCTIONS:
-                if message[1] == 98:
+                if message[1] == CAPTURE_MIDI_BUTTON:
                     # capture midi button
                     # enable shift mode
                     self.hook.toggleShift()
                 if self.shift:
-                    if message[1] == 95:
+                    if message[1] == SESSION_BUTTON:
                         # erase session
                         # delete pulse
                         if message[2] == 127:
@@ -310,23 +320,23 @@ class LaunchpadX(Holophonor):
                             self.hook.clearPulse()
                 else:
                     # normal (unshifted) mode
-                    if message[1] == 91 and message[2] == 127:
+                    if message[1] == UP_ARROW and message[2] == 127:
                         # arrow up button
                         # drum bank increment
                         self.hook.setDrumBank(bank=min(self.drum_bank + 1, 3))
-                    elif message[1] == 92 and message[2] == 127:
+                    elif message[1] == DOWN_ARROW and message[2] == 127:
                         # arrow down button
                         # drum bank decrement
                         self.hook.setDrumBank(bank=max(self.drum_bank - 1, -1))
-                    elif message[1] == 96:
+                    elif message[1] == NOTE_BUTTON:
                         # note button
                         # momentary cut mode - normal on release
                         self.hook.toggleCut()
-                    elif message[1] == 97 and message[2] == 127:
+                    elif message[1] == CUSTOM_BUTTON and message[2] == 127:
                         # custom button
                         # toggle overdub on button press
                         self.hook.toggleOverdub()
-                    elif message[1] == 95:
+                    elif message[1] == SESSION_BUTTON:
                         # session button
                         # tap-pulse
                         if message[2] == 127:
