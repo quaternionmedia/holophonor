@@ -11,17 +11,13 @@ class Fweelin(Holophonor):
     @holoimpl
     def stopLoop(self, loop: int):
         self.playLoop(loop, 127)
-
+    
     @holoimpl
     def recordLoop(self, loop: int):
         self.playLoop(loop, 127)
-
+    
     @holoimpl
     def eraseLoop(self, loop: int):
         self.playLoop(loop, 127)
-        
-        
-    @holoimpl
-    def triggerLoop(self, loop, volume):
-        self.midi.send_message([NOTE_ON, loop, volume])
+    
     
