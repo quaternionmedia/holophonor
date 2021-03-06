@@ -133,6 +133,8 @@ class LaunchpadX(Holophonor):
     def eraseScene(self, scene: int):
         self.midi.send_message([NOTE_ON, SCENES[scene], ERASE])
         self.scenes[scene] = None
+        if self.current_scene == scene:
+            self.current_scene = None
     
     @holoimpl
     def clearScene(self, scene: int):
@@ -200,7 +202,6 @@ class LaunchpadX(Holophonor):
             if message[1] in self.map:
                 l = self.map.index(message[1])
                 loop = self.loops[l]
-                # self.hook.triggerLoop(loop=l, volume=message[2])
                 if message[2]:
                     # note on event
                     if not self.shift:
