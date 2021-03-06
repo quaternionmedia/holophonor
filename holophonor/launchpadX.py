@@ -7,6 +7,7 @@ from rtmidi.midiconstants import NOTE_ON, CONTROL_CHANGE
 SCENES = [89, 79, 69, 59, 49, 39, 29, 19]
 FUNCTIONS = [91, 92, 93, 94 , 95, 96, 97, 98]
 DRUMS = [11, 12, 13, 14, 21, 22, 23, 24, 31, 32, 33, 34, 41, 42, 43, 44]
+DRUM_BANKS = [69, 79, 35, 15, 59]
 DRUM_PATCHES = [32, 24, 25, 56]
 FX = [35, 36, 37, 38, 45, 46, 47, 48]
 MUTES = [15, 16, 17, 18]
@@ -24,7 +25,9 @@ class LaunchpadX(Holophonor):
             n -= 10
         self.input, self.input_name = open_midiinput(self.port, client_name='launchpad->holo')
         self.input.set_callback(self)
+        self.drum_bank = 0
         self.clear()
+        self.lightDrums()
     
     def toggleLive(self):
         # switch to / from programming / Live mode
@@ -36,7 +39,16 @@ class LaunchpadX(Holophonor):
             self.midi.send_message([NOTE_ON, i, EMPTY])
         for i in range(len(self.mutes)):
             self.midi.send_message([NOTE_ON, i + 15, EMPTY if self.mutes[i] else RECORDING])
-
+    
+    def lightDrums(self):
+        for i in DRUMS:
+            self.midi.send_message([NOTE_ON, i, DRUM_BANKS[self.drum_bank]])
+        self.midi.send_message([NOTE_ON, 91, DRUM_BANKS[min(self.drum_bank + 1, 3)]])
+        self.midi.send_message([NOTE_ON, 92, DRUM_BANKS[max(self.drum_bank - 1, -1)]])
+    
+    def lightButton(self, note):
+        self.midi.send_message(note)
+        
     @holoimpl    
     def close(self):
         # exit programming mode
@@ -106,12 +118,17 @@ class LaunchpadX(Holophonor):
     @holoimpl
     def tapPulse(self):
         self.midi.send_message([CONTROL_CHANGE, 95, TAP])
-
+    
     @holoimpl
     def toggleMute(self, channel: int):
         self.midi.send_message([NOTE_ON, channel + 15, RECORDING if self.mutes[channel] else EMPTY])
         self.mutes[channel] = not self.mutes[channel]
 
+    @holoimpl
+    def setDrumBank(self, bank: int):
+        self.drum_bank = bank
+        self.lightDrums()
+    
     def __call__(self, event, data=None):
         message, deltatime = event
         print(message)
@@ -172,13 +189,14 @@ class LaunchpadX(Holophonor):
                         # if we erased the loop, clear the color
                         self.hook.clearLoop(loop=l)
             elif message[1] in DRUMS:
-                self.hook.playMidi([NOTE_ON | 0x9, 36 + DRUMS.index(message[1]) + self.drum_bank*16, message[2]])
+                self.hook.playNote(note=[NOTE_ON | 0x9, 36 + DRUMS.index(message[1]) + self.drum_bank*16, message[2]])
+                self.lightButton([NOTE_ON, message[1], message[2] if message[2] else DRUM_BANKS[self.drum_bank]])
             elif message[1] in FX and message[2]:
                 f = FX.index(message[1])
                 self.hook.toggleFX(fx=f)
             elif message[1] in DRUM_PATCHES and message[2]:
                 i = DRUM_PATCHES.index(message[1])
-                self.hook.setDrumPatch(i)
+                self.hook.setDrumPatch(patch=i)
             elif message[1] in MUTES and message[2]:
                 n = message[1] - 15
                 self.hook.toggleMute(channel=n)
@@ -222,11 +240,11 @@ class LaunchpadX(Holophonor):
                     if message[1] == 91 and message[2] == 127:
                         # arrow up button
                         # drum bank increment
-                        self.hook.setDrumBank(min(self.drum_bank + 1, 3))
+                        self.hook.setDrumBank(bank=min(self.drum_bank + 1, 3))
                     elif message[1] == 92 and message[2] == 127:
                         # arrow down button
                         # drum bank decrement
-                        self.hook.setDrumBank(max(self.drum_bank - 1, -1))
+                        self.hook.setDrumBank(bank=max(self.drum_bank - 1, -1))
                     elif message[1] == 96:
                         # note button
                         # momentary cut mode - normal on release
