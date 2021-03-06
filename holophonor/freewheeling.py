@@ -31,6 +31,18 @@ class Fweelin(Holophonor):
         self.playLoop(loop, 127)
         
     @holoimpl
+    def recallScene(self, scene: int):
+        '''recall a scene'''
+    
+    @holoimpl
+    def storeScene(self, scene: int):
+        '''store a scene'''
+    
+    @holoimpl
+    def eraseScene(self, scene: int):
+        '''erase a scene'''
+    
+    @holoimpl
     def toggleShift(self):
         self.midi.send_message([CONTROL_CHANGE, 98, 0 if self.shift else 127])
         self.shift = not self.shift
