@@ -35,3 +35,11 @@ class Fweelin(Holophonor):
         self.midi.send_message([CONTROL_CHANGE, 97, 0 if self.overdub else 127])
         self.overdub = not self.overdub
 
+
+    @holoimpl
+    def deletePulse(self):
+        self.midi.send_message([CONTROL_CHANGE, 108, 0])
+
+    @holoimpl
+    def tapPulse(self):
+        self.midi.send_message([CONTROL_CHANGE, 95, 127])
