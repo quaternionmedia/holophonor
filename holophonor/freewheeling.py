@@ -43,3 +43,8 @@ class Fweelin(Holophonor):
     @holoimpl
     def tapPulse(self):
         self.midi.send_message([CONTROL_CHANGE, 95, 127])
+
+    @holoimpl
+    def toggleMute(self, channel: int):
+        self.midi.send_message([CONTROL_CHANGE, 56  + channel, 0 if self.mutes[channel] else 127])
+        self.mutes[channel] = not self.mutes[channel]
