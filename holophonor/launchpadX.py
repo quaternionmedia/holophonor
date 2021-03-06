@@ -28,6 +28,7 @@ class LaunchpadX(Holophonor):
         self.input.set_callback(self)
         self.drum_bank = 0
         self.drum_patch = 0
+        self.fx = [False]*12
         self.clear()
         self.lightDrums()
     
@@ -125,6 +126,12 @@ class LaunchpadX(Holophonor):
     def toggleMute(self, channel: int):
         self.midi.send_message([NOTE_ON, channel + 15, RECORDING if self.mutes[channel] else EMPTY])
         self.mutes[channel] = not self.mutes[channel]
+
+
+    @holoimpl
+    def toggleFX(self, fx: int):
+        self.midi.send_message([NOTE_ON, FX[fx], EMPTY if self.fx[fx] else FX[fx]])
+        self.fx[fx] = not self.fx[fx]
 
     @holoimpl
     def setDrumPatch(self, patch: int):
