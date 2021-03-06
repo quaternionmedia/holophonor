@@ -92,7 +92,51 @@ class LaunchpadX(Holophonor):
     def overdubLoop(self, loop: int):
         self.midi.send_message([NOTE_ON, self.map[loop], RECORDING])
         self.loops[loop] = -1
-
+        
+    @holoimpl
+    def recallScene(self, scene: int):
+        if self.current_scene != None:
+            self.midi.send_message([CONTROL_CHANGE, SCENES[self.current_scene], STOPPED])
+        self.current_scene = scene
+        self.midi.send_message([CONTROL_CHANGE | 0x2, SCENES[scene], GREEN[-1]])
+        s = self.scenes[scene]
+        for l, b in enumerate(self.map):
+            if self.loops[l] != None:
+                # loop exists
+                if s[l] != self.loops[l]:
+                    # loop needs to be changed
+                    if s[l] in (0, None):
+                        if self.loops[l] > 0:
+                            # stop loop
+                            self.stopLoop(l)
+                            self.loops[l] = 0
+                    elif s[l] != None and self.loops[l] == 0:
+                        # start loop
+                        self.playLoop(l, s[l])
+                    else:
+                        # change the volume
+                        self.playLoop(l, s[l])
+                if s[l] in (0, None):
+                    self.stopLoop(l)
+                else:
+                    self.playLoop(l, s[l])
+    
+    @holoimpl
+    def storeScene(self, scene: int):
+        if self.current_scene != None:
+            self.midi.send_message([CONTROL_CHANGE, SCENES[self.current_scene], STOPPED])
+        self.current_scene = scene
+        self.scenes[scene] = self.loops.copy()
+        self.midi.send_message([NOTE_ON, SCENES[scene], GREEN[-1]])
+    
+    @holoimpl
+    def eraseScene(self, scene: int):
+        self.midi.send_message([NOTE_ON, SCENES[scene], ERASE])
+    
+    @holoimpl
+    def clearScene(self, scene: int):
+        self.midi.send_message([NOTE_ON, SCENES[scene], EMPTY])
+    
     @holoimpl
     def toggleShift(self):
         self.midi.send_message([CONTROL_CHANGE, 98, 0 if self.shift else ERASE])
@@ -113,6 +157,8 @@ class LaunchpadX(Holophonor):
         self.midi.send_message([CONTROL_CHANGE, 95, ERASE])
         self.clear()
         self.pulse = False
+        self.loops = [None]*len(self.map)
+        self.scenes = [None]*len(self.scenes)
     
     @holoimpl
     def clearPulse(self):
@@ -127,23 +173,24 @@ class LaunchpadX(Holophonor):
         self.midi.send_message([NOTE_ON, channel + 15, RECORDING if self.mutes[channel] else EMPTY])
         self.mutes[channel] = not self.mutes[channel]
 
-
+    
     @holoimpl
     def toggleFX(self, fx: int):
         self.midi.send_message([NOTE_ON, FX[fx], EMPTY if self.fx[fx] else FX[fx]])
         self.fx[fx] = not self.fx[fx]
-
+    
     @holoimpl
     def setDrumPatch(self, patch: int):
         self.midi.send_message([NOTE_ON, DRUM_PATCHES[patch], DRUM_PATCH_COLORS[patch]])
         for button in set(DRUM_PATCHES) - {DRUM_PATCHES[patch]}:
             self.midi.send_message([NOTE_ON, button, EMPTY])
         self.drum_patch = patch
-
+    
     @holoimpl
     def setDrumBank(self, bank: int):
         self.drum_bank = bank
         self.lightDrums()
+    
     
     def __call__(self, event, data=None):
         message, deltatime = event
@@ -235,9 +282,9 @@ class LaunchpadX(Holophonor):
                         else:
                             # store scene
                             self.hook.storeScene(scene=s)
-                else:
-                    # scene button released
-                    self.hook.clearScene(scene=s)
+                elif self.scenes[s] == None:
+                        # scene button released after erase
+                        self.hook.clearScene(scene=s)
             elif message[1] in FUNCTIONS:
                 if message[1] == 98:
                     # capture midi button
