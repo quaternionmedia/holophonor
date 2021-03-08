@@ -40,10 +40,6 @@ class Holophonor:
         '''clear the button on release for the selected loop'''
     
     @holospec
-    def startLoopInCutMode(self, loop: int, volume: int):
-        '''fix for FreeWheeling not starting loops while in cut mode'''
-    
-    @holospec
     def overdubLoop(self, loop: int):
         '''overdub the selected loop'''
         
