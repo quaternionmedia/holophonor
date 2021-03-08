@@ -100,13 +100,10 @@ class LaunchpadX(Holophonor):
         self.midi.send_message([NOTE_ON, self.map[loop], EMPTY])
     
     @holoimpl
-    def startLoopInCutMode(self, loop, volume):
-        self.playLoop(loop, volume)
-    
-    @holoimpl
     def overdubLoop(self, loop: int):
-        self.midi.send_message([NOTE_ON, self.map[loop], RECORDING])
-        self.loops[loop] = -1
+        if self.loops[loop] != -2:
+            self.midi.send_message([NOTE_ON, self.map[loop], RECORDING])
+            self.loops[loop] = -2
         
     @holoimpl
     def recallScene(self, scene: int):
@@ -232,43 +229,25 @@ class LaunchpadX(Holophonor):
                     # note on event
                     if not self.shift:
                         # normal (unshifted) mode
-                        if self.cut:
+                        if loop == None:
+                            # no existing loop, we are now recording.
+                            self.hook.recordLoop(loop=l, volume=message[2])
+                        elif self.cut:
                             # cut mode
-                            if loop in (0, None):
-                                self.hook.startLoopInCutMode(loop=l, volume=message[2])
-                            if loop == None:
-                                # no existing loop, we are now recording.
-                                self.hook.recordLoop(loop=l, volume=message[2])
+                            self.hook.playLoop(loop=l, volume=message[2])
+                        elif self.overdub:
+                            # overdub loop
+                            if loop != -2:
+                                self.hook.overdubLoop(loop=l)
                             else:
-                                # loop was paused. Play now
                                 self.hook.playLoop(loop=l, volume=message[2])
-                            
+                            # regular mode - no cut, no overdub
+                        elif loop > 0:
+                            # loop was playing
+                            self.hook.stopLoop(loop=l)
                         else:
-                            # normal (uncut) mode
-                            if loop == None:
-                                # no existing loop - start recording
-                                # red - pulsing
-                                self.hook.recordLoop(loop=l)
-                            elif loop == -1:
-                                # loop is overdubbing
-                                # play at proper volume
-                                self.hook.playLoop(loop=l, volume=message[2])
-                            elif loop == 0:
-                                # loop stopped (or recording)
-                                if self.overdub:
-                                    # overdub loop
-                                    self.hook.overdubLoop(loop=l)
-                                else:
-                                    # start playing
-                                    self.hook.playLoop(loop=l, volume=message[2])
-                            else:
-                                # loop is playing
-                                if self.overdub:
-                                    # overdub loop
-                                    self.hook.overdubLoop(loop=l)
-                                else:
-                                    # stop loop
-                                    self.hook.stopLoop(loop=l)
+                            # loop must be stopped, recording or overdubbing
+                            self.hook.playLoop(loop=l, volume=message[2])
                     else:
                         # shift mode
                         # erase loop
@@ -318,7 +297,7 @@ class LaunchpadX(Holophonor):
                 if message[1] == CAPTURE_MIDI_BUTTON:
                     # capture midi button
                     # enable shift mode
-                    self.hook.toggleShift()
+                    self.toggleShift()
                 if self.shift:
                     if message[1] == SESSION_BUTTON:
                         # erase session
@@ -345,11 +324,13 @@ class LaunchpadX(Holophonor):
                     elif message[1] == NOTE_BUTTON:
                         # note button
                         # momentary cut mode - normal on release
-                        self.hook.toggleCut()
+                        # note: because all logic is explicit (playLoop, stopLoop, etc)
+                        # all state changes can be purely local!
+                        self.toggleCut()
                     elif message[1] == CUSTOM_BUTTON and message[2] == 127:
                         # custom button
                         # toggle overdub on button press
-                        self.hook.toggleOverdub()
+                        self.toggleOverdub()
                     elif message[1] == SESSION_BUTTON:
                         # session button
                         # tap-pulse

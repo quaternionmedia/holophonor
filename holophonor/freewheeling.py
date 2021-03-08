@@ -2,60 +2,72 @@ from holophonor import holoimpl
 from holophonor.holospecs import Holophonor
 from holophonor.constants import NUMBER_LOOPS
 from rtmidi.midiconstants import NOTE_ON, NOTE_OFF, POLY_AFTERTOUCH, CONTROL_CHANGE, PROGRAM_CHANGE
+from time import sleep
 
 
 class Fweelin(Holophonor):
     @holoimpl
     def playLoop(self, loop: int, volume: int):
+        if self.loops[loop] and self.loops[loop] > 0:
+            # loop was playing at a differet volume
+            # stop first
+            self.stopLoop(loop)
         self.midi.send_message([NOTE_ON, loop, volume])
         self.loops[loop] = volume
         
     @holoimpl
     def stopLoop(self, loop: int):
-        self.playLoop(loop, 127)
+        if self.loops[loop] not in (0, None):
+            self.midi.send_message([NOTE_ON, loop, 1])
+        if self.loops[loop] and self.loops[loop] < 1:
+            # loop was recording or overdubbing
+            # send another message to stop
+            self.midi.send_message([NOTE_ON, loop, 1])
         self.loops[loop] = 0
     
     @holoimpl
     def recordLoop(self, loop: int):
-        self.playLoop(loop, 127)
-        self.loops[loop] = 0
+        if self.loops[loop] == None:
+            self.playLoop(loop, 127)
+            self.loops[loop] = -1
     
     @holoimpl
     def eraseLoop(self, loop: int):
-        self.playLoop(loop, 127)
-        self.loops[loop] = None
-    
-    @holoimpl
-    def startLoopInCutMode(self, loop: int, volume: int):
-        self.midi.send_message([CONTROL_CHANGE, 118, 0])
-        self.midi.send_message([NOTE_ON, loop, volume])
-        self.midi.send_message([CONTROL_CHANGE, 118, 127])
+        if self.loops[loop] is not None:
+            self.toggleShift()
+            self.playLoop(loop, 127)
+            self.toggleShift()
+            self.loops[loop] = None
     
     @holoimpl
     def overdubLoop(self, loop: int):
-        self.playLoop(loop, 127)
+        self.toggleOverdub()
+        self.midi.send_message([NOTE_ON, loop, 127])
+        self.toggleOverdub()
+        self.loops[loop] = -2
         
     @holoimpl
     def recallScene(self, scene: int):
         self.current_scene = scene
         s = self.scenes[scene]
         for l in range(NUMBER_LOOPS):
-            if self.loops[l] != None:
+            if self.loops[l] != None and s[l] != None:
                 # loop exists
                 if s[l] != self.loops[l]:
                     # loop needs to be changed
-                    if s[l] in (0, None):
-                        if self.loops[l] > 0:
-                            # stop loop
-                            self.stopLoop(l)
-                    elif s[l] != None and self.loops[l] == 0:
+                    if s[l] == 0:
+                        # stop loop
+                        self.stopLoop(l)
+                    elif self.loops[l] == 0:
                         # start loop
                         self.playLoop(l, s[l])
                     else:
                         # change volume
                         # send two messages: stop, then start
                         self.stopLoop(l)
-                        self.playLoop(l, s[l])
+                        # if the loop is < 0 (recording, overdubbing)
+                        # we have no volume information. Guess at 100
+                        self.playLoop(l, s[l] if s[l] > 0 else 100)
     @holoimpl
     def storeScene(self, scene: int):
         self.current_scene = scene
