@@ -89,6 +89,12 @@ class Fweelin(Holophonor):
         self.midi.send_message([CONTROL_CHANGE, 95, 127])
     
     @holoimpl
+    def stopAllLoops(self):
+        for i, l in enumerate(self.loops):
+            if l:
+                self.midi.send_message([NOTE_ON, i, 127])
+
+    @holoimpl
     def toggleMute(self, channel: int):
         self.midi.send_message([CONTROL_CHANGE, 56  + channel, 0 if self.mutes[channel] else 127])
         self.mutes[channel] = not self.mutes[channel]

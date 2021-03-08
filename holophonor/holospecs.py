@@ -83,9 +83,9 @@ class Holophonor:
     def clearPulse(self):
         '''release pulse button'''
     
-    # @holospec
-    # def clear(self):
-    #     '''clear all loops'''
+    @holospec
+    def stopAllLoops(self):
+        '''stop all loops'''
     
     @holospec
     def tapPulse(self):
