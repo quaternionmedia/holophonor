@@ -26,14 +26,14 @@ CAPTURE_MIDI_BUTTON = 98
 class LaunchpadX(Holophonor):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.live = False
-        self.toggleLive()
         self.map = []
         n = 81
         for y in range(4):
             for x in range(8):
                 self.map.append(n + x)
             n -= 10
+        self.live = False
+        self.toggleLive()
         self.input, self.input_name = open_midiinput(self.port, client_name='launchpadX->holo')
         self.input.set_callback(self)
         self.drum_bank = 0
@@ -157,18 +157,18 @@ class LaunchpadX(Holophonor):
     
     @holoimpl
     def toggleShift(self):
-        self.midi.send_message([CONTROL_CHANGE, CAPTURE_MIDI_BUTTON, 0 if self.shift else ERASE])
         self.shift = not self.shift
+        self.midi.send_message([CONTROL_CHANGE, CAPTURE_MIDI_BUTTON, ERASE if self.shift else 0])
     
     @holoimpl
     def toggleCut(self):
-        self.midi.send_message([CONTROL_CHANGE, NOTE_BUTTON, 0 if self.cut else CUT])
         self.cut = not self.cut
+        self.midi.send_message([CONTROL_CHANGE, NOTE_BUTTON, CUT if self.cut else 0])
     
     @holoimpl
     def toggleOverdub(self):
-        self.midi.send_message([CONTROL_CHANGE, CUSTOM_BUTTON, 0 if self.overdub else RECORDING])
         self.overdub = not self.overdub
+        self.midi.send_message([CONTROL_CHANGE, CUSTOM_BUTTON, RECORDING if self.overdub else 0])
     
     @holoimpl
     def deletePulse(self):
