@@ -183,6 +183,12 @@ class LaunchpadX(Holophonor):
         self.midi.send_message([CONTROL_CHANGE, SESSION_BUTTON, EMPTY])
     
     @holoimpl
+    def stopAllLoops(self):
+        for i, l in enumerate(self.loops):
+            if l:
+                self.midi.send_message([NOTE_ON, self.map[i], STOPPED])
+
+    @holoimpl
     def tapPulse(self):
         self.midi.send_message([CONTROL_CHANGE, SESSION_BUTTON, TAP if self.tap else PULSE])
         self.tap = not self.tap
@@ -332,6 +338,9 @@ class LaunchpadX(Holophonor):
                         # arrow down button
                         # drum bank decrement
                         self.setDrumBank(bank=max(self.drum_bank - 1, -1))
+                    elif message[1] == LEFT_ARROW and message[2] == 127:
+                        # left arrow button
+                        self.hook.stopAllLoops()
                     elif message[1] == NOTE_BUTTON:
                         # note button
                         # momentary cut mode - normal on release
