@@ -185,6 +185,9 @@ class LaunchpadX(Holophonor):
         for i, l in enumerate(self.loops):
             if l:
                 self.midi.send_message([NOTE_ON, self.map[i], STOPPED])
+        if self.current_scene != None:
+            self.midi.send_message([CONTROL_CHANGE, SCENES[self.current_scene], STOPPED])
+            self.current_scene = None
 
     @holoimpl
     def tapPulse(self):
