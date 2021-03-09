@@ -1,6 +1,9 @@
 from holophonor import holoimpl
+from holophonor.holospecs import Holophonor
 from holophonor.launchpadX import LaunchpadX
 from itertools import chain
+from rtmidi.midiutil import open_midiinput
+from rtmidi.midiconstants import NOTE_ON, CONTROL_CHANGE
 
 SCENES = list(range(8, 121, 16))
 FUNCTIONS = list(range(104, 112))
@@ -32,7 +35,7 @@ CAPTURE_MIDI_BUTTON = 111
 
 class LaunchpadS(LaunchpadX):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        Holophonor.__init__(self, *args, **kwargs)
         self.map = []
         n = 0
         for y in range(4):
