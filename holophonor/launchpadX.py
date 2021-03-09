@@ -74,7 +74,7 @@ class LaunchpadX(Holophonor):
     @holoimpl
     def recordLoop(self, loop):
         self.midi.send_message([NOTE_ON | 0x2, self.map[loop], RECORDING])
-        self.loops[loop] = 0
+        self.loops[loop] = -1
     
     @holoimpl
     def playLoop(self, loop, volume):

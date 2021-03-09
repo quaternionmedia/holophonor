@@ -17,13 +17,14 @@ class Fweelin(Holophonor):
         
     @holoimpl
     def stopLoop(self, loop: int):
-        if self.loops[loop] not in (0, None):
+        if self.loops[loop]:
             self.midi.send_message([NOTE_ON, loop, 1])
-        if self.loops[loop] and self.loops[loop] < 1:
-            # loop was recording or overdubbing
-            # send another message to stop
-            self.midi.send_message([NOTE_ON, loop, 1])
-        self.loops[loop] = 0
+            if self.loops[loop] < 0:
+                # loop was recording or overdubbing
+                # send another message to stop
+                sleep(.01)
+                self.midi.send_message([NOTE_ON, loop, 1])
+            self.loops[loop] = 0
     
     @holoimpl
     def recordLoop(self, loop: int):
@@ -104,7 +105,7 @@ class Fweelin(Holophonor):
     def stopAllLoops(self):
         for i, l in enumerate(self.loops):
             if l:
-                self.midi.send_message([NOTE_ON, i, 127])
+                self.stopLoop(i)
 
     @holoimpl
     def toggleMute(self, channel: int):
