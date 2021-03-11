@@ -54,14 +54,14 @@ class LaunchpadX(Holophonor):
             self.midi.send_message([NOTE_ON, i, EMPTY])
         for i in range(len(self.mutes)):
             self.midi.send_message([NOTE_ON, MUTES[i], EMPTY if self.mutes[i] else RECORDING])
-        self.midi.send_message([NOTE_ON, 99, 1])
-        self.midi.send_message([NOTE_ON, LEFT_ARROW, STOPPED])
+        self.midi.send_message([CONTROL_CHANGE, 99, 1])
+        self.midi.send_message([CONTROL_CHANGE, LEFT_ARROW, STOPPED])
     
     def lightDrums(self):
         for i in DRUMS:
             self.midi.send_message([NOTE_ON, i, DRUM_BANKS[self.drum_bank]])
-        self.midi.send_message([NOTE_ON, UP_ARROW, DRUM_BANKS[min(self.drum_bank + 1, 3)]])
-        self.midi.send_message([NOTE_ON, DOWN_ARROW, DRUM_BANKS[max(self.drum_bank - 1, -1)]])
+        self.midi.send_message([CONTROL_CHANGE, UP_ARROW, DRUM_BANKS[min(self.drum_bank + 1, 3)]])
+        self.midi.send_message([CONTROL_CHANGE, DOWN_ARROW, DRUM_BANKS[max(self.drum_bank - 1, -1)]])
     
     def lightButton(self, note):
         self.midi.send_message(note)
@@ -139,18 +139,18 @@ class LaunchpadX(Holophonor):
             self.midi.send_message([CONTROL_CHANGE, SCENES[self.current_scene], STOPPED])
         self.current_scene = scene
         self.scenes[scene] = self.loops.copy()
-        self.midi.send_message([NOTE_ON, SCENES[scene], GREEN[-1]])
+        self.midi.send_message([CONTROL_CHANGE, SCENES[scene], GREEN[-1]])
     
     @holoimpl
     def eraseScene(self, scene: int):
-        self.midi.send_message([NOTE_ON, SCENES[scene], ERASE])
+        self.midi.send_message([CONTROL_CHANGE, SCENES[scene], ERASE])
         self.scenes[scene] = None
         if self.current_scene == scene:
             self.current_scene = None
     
     @holoimpl
     def clearScene(self, scene: int):
-        self.midi.send_message([NOTE_ON, SCENES[scene], EMPTY])
+        self.midi.send_message([CONTROL_CHANGE, SCENES[scene], EMPTY])
     
     @holoimpl
     def toggleShift(self):
@@ -174,7 +174,7 @@ class LaunchpadX(Holophonor):
         self.pulse = False
         self.loops = [None]*len(self.map)
         self.scenes = [None]*len(self.scenes)
-        self.midi.send_message([NOTE_ON, 99, 1])
+        self.midi.send_message([CONTROL_CHANGE, 99, 1])
     
     @holoimpl
     def clearPulse(self):
@@ -195,7 +195,7 @@ class LaunchpadX(Holophonor):
         self.midi.send_message([CONTROL_CHANGE, SESSION_BUTTON, TAP if self.tap else PULSE])
         if not self.tap and not self.pulse:
             self.pulse = True
-            self.midi.send_message([NOTE_ON, 99, PULSE])
+            self.midi.send_message([CONTROL_CHANGE, 99, PULSE])
     
     @holoimpl
     def toggleMute(self, channel: int):
@@ -210,7 +210,7 @@ class LaunchpadX(Holophonor):
     
     @holoimpl
     def setDrumPatch(self, patch: int):
-        self.midi.send_message([NOTE_ON, DRUM_PATCHES[patch], DRUM_PATCH_COLORS[patch]])
+        self.midi.send_message([CONTROL_CHANGE, DRUM_PATCHES[patch], DRUM_PATCH_COLORS[patch]])
         for button in set(DRUM_PATCHES) - {DRUM_PATCHES[patch]}:
             self.midi.send_message([NOTE_ON, button, EMPTY])
         self.drum_patch = patch
