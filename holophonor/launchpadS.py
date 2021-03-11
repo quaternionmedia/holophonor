@@ -52,7 +52,7 @@ class LaunchpadS(LaunchpadX):
         self.clear()
         self.lightDrums()
     
-    def setLayout(layout):
+    def setLayout(self, layout):
         self.midi.send_message([CONTROL_CHANGE, 0, layout])
     
     @holoimpl
