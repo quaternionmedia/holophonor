@@ -53,7 +53,7 @@ class LaunchpadX(Holophonor):
         for i in SCENES:
             self.midi.send_message([NOTE_ON, i, EMPTY])
         for i in range(len(self.mutes)):
-            self.midi.send_message([NOTE_ON, i + 15, EMPTY if self.mutes[i] else RECORDING])
+            self.midi.send_message([NOTE_ON, MUTES[i], EMPTY if self.mutes[i] else RECORDING])
         self.midi.send_message([NOTE_ON, 99, 1])
         self.midi.send_message([NOTE_ON, LEFT_ARROW, STOPPED])
     
@@ -199,7 +199,7 @@ class LaunchpadX(Holophonor):
     
     @holoimpl
     def toggleMute(self, channel: int):
-        self.midi.send_message([NOTE_ON, channel + 15, RECORDING if self.mutes[channel] else EMPTY])
+        self.midi.send_message([NOTE_ON, self.mutes, RECORDING if self.mutes[channel] else EMPTY])
         self.mutes[channel] = not self.mutes[channel]
 
     
@@ -271,7 +271,7 @@ class LaunchpadX(Holophonor):
                 i = DRUM_PATCHES.index(message[1])
                 self.hook.setDrumPatch(patch=i)
             elif message[1] in MUTES and message[2]:
-                n = message[1] - 15
+                n = MUTES.index(message[1])
                 self.hook.toggleMute(channel=n)
             else:
                 # no matching rule found for note
