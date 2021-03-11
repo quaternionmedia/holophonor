@@ -100,5 +100,5 @@ class LaunchpadS(LaunchpadX):
     
     @holoimpl
     def close(self):
-        # no need to exit live mode
-        pass
+        # clear all lights on exit
+        self.midi.send_message([CONTROL_CHANGE, 0, 0])
