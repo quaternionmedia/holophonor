@@ -47,8 +47,13 @@ class LaunchpadS(LaunchpadX):
         self.drum_bank = 0
         self.drum_patch = 0
         self.fx = [False]*8
+        # set to x-y layout
+        self.setLayout(1)
         self.clear()
         self.lightDrums()
+    
+    def setLayout(layout):
+        self.midi.send_message([CONTROL_CHANGE, 0, layout])
     
     @holoimpl
     def recordLoop(self, loop):
