@@ -9,7 +9,7 @@ SCENES = list(range(8, 121, 16))
 FUNCTIONS = list(range(104, 112))
 DRUMS = [i for i in chain.from_iterable([list(range(x, x+4)) for x in list(range(64, 113, 16))])]
 
-DRUM_BANKS = [45, 62, 63, 47, 13]
+DRUM_BANKS = [45, 46, 47, 31, 32]
 DRUM_PATCHES = list(range(100, 104))
 DRUM_PATCH_COLORS = DRUM_BANKS[:-1]
 FX = [i for i in chain.from_iterable([list(range(x, x+4)) for x in list(range(68, 113, 16))])]
@@ -19,7 +19,7 @@ RECORDING = 15
 ERASE = 47
 GREEN = list(range(28, 61, 16)) + [60]
 STOPPED = 46
-EMPTY = 0
+EMPTY = 12
 CUT = 63
 PULSE = 60
 TAP = 62
