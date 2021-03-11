@@ -199,7 +199,7 @@ class LaunchpadX(Holophonor):
     
     @holoimpl
     def toggleMute(self, channel: int):
-        self.midi.send_message([NOTE_ON, self.mutes, RECORDING if self.mutes[channel] else EMPTY])
+        self.midi.send_message([NOTE_ON, MUTES[channel], RECORDING if self.mutes[channel] else EMPTY])
         self.mutes[channel] = not self.mutes[channel]
 
     
