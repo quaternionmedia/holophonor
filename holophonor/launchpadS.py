@@ -7,7 +7,7 @@ from rtmidi.midiconstants import NOTE_ON, CONTROL_CHANGE
 
 SCENES = list(range(8, 121, 16))
 FUNCTIONS = list(range(104, 112))
-DRUMS = [i for i in chain.from_iterable([list(range(x, x+4)) for x in list(range(64, 113, 16))])]
+DRUMS = [i for i in chain.from_iterable([list(range(x, x+4)) for x in list(range(112, 63, -16))])]
 
 DRUM_BANKS = [45, 46, 47, 31, 32]
 DRUM_PATCHES = list(range(100, 104))
@@ -66,8 +66,7 @@ class LaunchpadS(LaunchpadX):
         self.loops[loop] = volume
         if not self.pulse:
             self.pulse = True
-            self.midi.send_message([CONTROL_CHANGE, 95, PULSE])
-            self.midi.send_message([CONTROL_CHANGE, 99, PULSE])
+            self.midi.send_message([CONTROL_CHANGE, SESSION_BUTTON, PULSE])
     
     @holoimpl
     def recallScene(self, scene: int):
