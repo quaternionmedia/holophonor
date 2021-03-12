@@ -78,7 +78,7 @@ class LaunchpadX(Holophonor):
     
     @holoimpl
     def playLoop(self, loop, volume):
-        self.midi.send_message([NOTE_ON | 0x2, self.map[loop], GREEN[volume >> 4]])
+        self.midi.send_message([NOTE_ON | 0x2, self.map[loop], GREEN[(volume if volume > 0 else 100 )>> 4]])
         self.loops[loop] = volume
         if not self.pulse:
             self.pulse = True
@@ -112,26 +112,21 @@ class LaunchpadX(Holophonor):
         self.current_scene = scene
         self.midi.send_message([CONTROL_CHANGE | 0x2, SCENES[scene], GREEN[-1]])
         s = self.scenes[scene]
-        for l, b in enumerate(self.map):
+        for l in range(len(self.map)):
             if self.loops[l] != None:
                 # loop exists
                 if s[l] != self.loops[l]:
                     # loop needs to be changed
                     if s[l] in (0, None):
-                        if self.loops[l] > 0:
+                        if self.loops[l]:
                             # stop loop
                             self.stopLoop(l)
-                            self.loops[l] = 0
-                    elif s[l] != None and self.loops[l] == 0:
+                    elif self.loops[l] == 0:
                         # start loop
                         self.playLoop(l, s[l])
                     else:
-                        # change the volume
-                        self.playLoop(l, s[l])
-                if s[l] in (0, None):
-                    self.stopLoop(l)
-                else:
-                    self.playLoop(l, s[l])
+                        # start loop (or change volume)
+                        self.playLoop(l, s[l] if s[l] > 0 else 100)
     
     @holoimpl
     def storeScene(self, scene: int):
