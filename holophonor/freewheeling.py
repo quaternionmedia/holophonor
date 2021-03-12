@@ -8,11 +8,11 @@ from time import sleep
 class Fweelin(Holophonor):
     @holoimpl
     def playLoop(self, loop: int, volume: int):
-        if self.loops[loop] and self.loops[loop] > 0:
+        if self.loops[loop] and self.loops[loop] != volume:
             # loop was playing at a differet volume
             # stop first
             self.stopLoop(loop)
-        self.midi.send_message([NOTE_ON, loop, volume])
+        self.midi.send_message([NOTE_ON, loop, volume if volume > 0 else 100])
         self.loops[loop] = volume
         
     @holoimpl
@@ -52,20 +52,16 @@ class Fweelin(Holophonor):
         self.current_scene = scene
         s = self.scenes[scene]
         for l in range(NUMBER_LOOPS):
-            if self.loops[l] != None and s[l] != None:
+            if self.loops[l] != None:
                 # loop exists
                 if s[l] != self.loops[l]:
                     # loop needs to be changed
-                    if s[l] == 0:
-                        # stop loop
-                        self.stopLoop(l)
-                    elif self.loops[l] == 0:
-                        # start loop
-                        self.playLoop(l, s[l])
+                    if s[l] in (0, None):
+                        if self.loops[l]:
+                            # stop loop
+                            self.stopLoop(l)
                     else:
                         # change volume
-                        # send two messages: stop, then start
-                        self.stopLoop(l)
                         # if the loop is < 0 (recording, overdubbing)
                         # we have no volume information. Guess at 100
                         self.playLoop(l, s[l] if s[l] > 0 else 100)
