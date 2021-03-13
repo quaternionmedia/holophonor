@@ -9,3 +9,4 @@ TAP = 37 # cyan
 GREEN = [ 123, 23, 64, 22, 76, 87, 21, 122 ]
 
 NUMBER_LOOPS = 32
+NUMBER_SCENES = 8

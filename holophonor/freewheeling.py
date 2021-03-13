@@ -1,6 +1,6 @@
 from holophonor import holoimpl
 from holophonor.holospecs import Holophonor
-from holophonor.constants import NUMBER_LOOPS
+from holophonor.constants import NUMBER_LOOPS, NUMBER_SCENES
 from rtmidi.midiconstants import NOTE_ON, NOTE_OFF, POLY_AFTERTOUCH, CONTROL_CHANGE, PROGRAM_CHANGE
 from time import sleep
 
@@ -92,6 +92,8 @@ class Fweelin(Holophonor):
     @holoimpl
     def deletePulse(self):
         self.midi.send_message([CONTROL_CHANGE, 108, 0])
+        self.loops = [None]*NUMBER_LOOPS
+        self.scenes = [None]*NUMBER_SCENES
     
     @holoimpl
     def tapPulse(self):
