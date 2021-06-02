@@ -181,7 +181,7 @@ class LaunchpadX(Holophonor):
             if l:
                 self.midi.send_message([NOTE_ON, self.map[i], STOPPED])
         if self.current_scene != None:
-            self.midi.send_message([CONTROL_CHANGE, self.SCENES[self.current_scene], STOPPED])
+            self.midi.send_message([NOTE_ON, self.SCENES[self.current_scene], STOPPED])
             self.current_scene = None
 
     @holoimpl

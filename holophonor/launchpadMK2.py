@@ -1,7 +1,4 @@
 from holophonor.launchpadX import LaunchpadX
-from holophonor.holospecs import Holophonor
-from rtmidi.midiutil import open_midiinput
-from rtmidi.midiconstants import NOTE_ON, CONTROL_CHANGE
 
 
 class LaunchpadMK2(LaunchpadX):
