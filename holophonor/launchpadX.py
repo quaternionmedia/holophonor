@@ -54,6 +54,13 @@ class LaunchpadX(Holophonor):
             self.midi.send_message([NOTE_ON, i, EMPTY])
         for i in range(len(self.mutes)):
             self.midi.send_message([NOTE_ON, self.MUTES[i], EMPTY if self.mutes[i] else RECORDING])
+        for i in range(len(self.FX)):
+            self.midi.send_message([NOTE_ON, self.FX[i], EMPTY if self.fx[i] else self.fx[i]])
+        for i in range(len(self.FUNCTIONS)):
+            self.midi.send_message([CONTROL_CHANGE, self.FUNCTIONS[i], EMPTY])
+        for i in range(len(self.DRUM_PATCHES)):
+            self.midi.send_message([NOTE_ON, self.DRUM_PATCHES[i], EMPTY])
+        self.midi.send_message([NOTE_ON, self.DRUM_PATCHES[self.drum_patch], self.DRUM_PATCH_COLORS[self.drum_patch]])
         self.midi.send_message([CONTROL_CHANGE, 99, 1])
         self.midi.send_message([CONTROL_CHANGE, self.LEFT_ARROW, STOPPED])
     
