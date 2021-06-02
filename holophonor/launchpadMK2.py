@@ -5,6 +5,7 @@ from rtmidi.midiconstants import NOTE_ON, CONTROL_CHANGE
 
 
 class LaunchpadMK2(LaunchpadX):
+    FUNCTIONS = list(range(104, 112))
     UP_ARROW = 104
     DOWN_ARROW = 105
     LEFT_ARROW = 106

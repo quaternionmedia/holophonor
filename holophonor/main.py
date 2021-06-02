@@ -2,6 +2,7 @@ from holophonor.holospecs import Holophonor
 from holophonor.freewheeling import Fweelin
 from holophonor.qsynth import Qsynth
 from holophonor.launchpadX import LaunchpadX
+from holophonor.launchpadMK2 import LaunchpadMK2
 from pluggy import PluginManager
 
 
@@ -20,6 +21,7 @@ def get_plugin_manager():
     pm.add_hookspecs(Holophonor)
     pm.register(Fweelin(pm.hook, 'FreeWheeling:FreeWheeling IN 1', client_name='holo->fweelin'))
     pm.register(LaunchpadX(pm.hook, 'Launchpad X:Launchpad X MIDI 2', client_name='holo->launchpadX'))
+    pm.register(LaunchpadMK2(pm.hook, 'Launchpad MK2:Launchpad MK2 MIDI 1', client_name='holo->LaunchpadMK2'))
     pm.register(Qsynth(pm.hook, 'FLUID Synth (ElectricMayhem)', client_name='holo->qsynth'))
     return pm
 

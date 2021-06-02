@@ -108,9 +108,9 @@ class LaunchpadX(Holophonor):
     @holoimpl
     def recallScene(self, scene: int):
         if self.current_scene != None:
-            self.midi.send_message([CONTROL_CHANGE, self.SCENES[self.current_scene], STOPPED])
+            self.midi.send_message([NOTE_ON, self.SCENES[self.current_scene], STOPPED])
         self.current_scene = scene
-        self.midi.send_message([CONTROL_CHANGE | 0x2, self.SCENES[scene], GREEN[-1]])
+        self.midi.send_message([NOTE_ON | 0x2, self.SCENES[scene], GREEN[-1]])
         s = self.scenes[scene]
         for l in range(len(self.map)):
             if self.loops[l] != None:
@@ -131,21 +131,21 @@ class LaunchpadX(Holophonor):
     @holoimpl
     def storeScene(self, scene: int):
         if self.current_scene != None:
-            self.midi.send_message([CONTROL_CHANGE, self.SCENES[self.current_scene], STOPPED])
+            self.midi.send_message([NOTE_ON, self.SCENES[self.current_scene], STOPPED])
         self.current_scene = scene
         self.scenes[scene] = self.loops.copy()
-        self.midi.send_message([CONTROL_CHANGE, self.SCENES[scene], GREEN[-1]])
+        self.midi.send_message([NOTE_ON, self.SCENES[scene], GREEN[-1]])
     
     @holoimpl
     def eraseScene(self, scene: int):
-        self.midi.send_message([CONTROL_CHANGE, self.SCENES[scene], ERASE])
+        self.midi.send_message([NOTE_ON, self.SCENES[scene], ERASE])
         self.scenes[scene] = None
         if self.current_scene == scene:
             self.current_scene = None
     
     @holoimpl
     def clearScene(self, scene: int):
-        self.midi.send_message([CONTROL_CHANGE, self.SCENES[scene], EMPTY])
+        self.midi.send_message([NOTE_ON, self.SCENES[scene], EMPTY])
     
     @holoimpl
     def toggleShift(self):
@@ -271,7 +271,8 @@ class LaunchpadX(Holophonor):
             else:
                 # no matching rule found for note
                 pass
-        elif message[0] == CONTROL_CHANGE:
+        if message[0] in (CONTROL_CHANGE, NOTE_ON):
+            # for MK2 compatibility, where scenes are sent as NOTE_ON
             if message[1] in self.SCENES:
                 s = self.SCENES.index(message[1])
                 if message[2] == 127:
@@ -291,7 +292,8 @@ class LaunchpadX(Holophonor):
                     # scene button released
                     if self.scenes[s] == None:
                         self.hook.clearScene(scene=s)
-            elif message[1] in self.FUNCTIONS:
+        if message[0] == CONTROL_CHANGE:
+            if message[1] in self.FUNCTIONS:
                 if message[1] == self.CAPTURE_MIDI_BUTTON:
                     # capture midi button
                     # enable shift mode
