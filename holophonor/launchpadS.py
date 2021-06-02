@@ -5,35 +5,35 @@ from itertools import chain
 from rtmidi.midiutil import open_midiinput
 from rtmidi.midiconstants import NOTE_ON, CONTROL_CHANGE
 
-SCENES = list(range(8, 121, 16))
-FUNCTIONS = list(range(104, 112))
-DRUMS = [i for i in chain.from_iterable([list(range(x, x+4)) for x in list(range(112, 63, -16))])]
-
-DRUM_BANKS = [45, 46, 47, 31, 32]
-DRUM_PATCHES = list(range(100, 104))
-DRUM_PATCH_COLORS = DRUM_BANKS[:-1]
-FX = [i for i in chain.from_iterable([list(range(x, x+4)) for x in list(range(68, 113, 16))])]
-MUTES = list(range(116, 120))
-
-RECORDING = 15
-ERASE = 47
-GREEN = list(range(28, 61, 16)) + [60]
-STOPPED = 46
-EMPTY = 12
-CUT = 63
-PULSE = 60
-TAP = 62
-
-UP_ARROW = 104
-DOWN_ARROW = 105
-LEFT_ARROW = 106
-RIGHT_ARROW = 107
-SESSION_BUTTON = 108
-NOTE_BUTTON = 109
-CUSTOM_BUTTON = 110
-CAPTURE_MIDI_BUTTON = 111
 
 class LaunchpadS(LaunchpadX):
+    SCENES = list(range(8, 121, 16))
+    FUNCTIONS = list(range(104, 112))
+    DRUMS = [i for i in chain.from_iterable([list(range(x, x+4)) for x in list(range(112, 63, -16))])]
+    
+    DRUM_BANKS = [45, 46, 47, 31, 32]
+    DRUM_PATCHES = list(range(100, 104))
+    DRUM_PATCH_COLORS = [45, 46, 47, 31]
+    FX = [i for i in chain.from_iterable([list(range(x, x+4)) for x in list(range(68, 113, 16))])]
+    MUTES = list(range(116, 120))
+    
+    RECORDING = 15
+    ERASE = 47
+    GREEN = list(range(28, 61, 16)) + [60]
+    STOPPED = 46
+    EMPTY = 12
+    CUT = 63
+    PULSE = 60
+    TAP = 62
+    
+    UP_ARROW = 104
+    DOWN_ARROW = 105
+    LEFT_ARROW = 106
+    RIGHT_ARROW = 107
+    SESSION_BUTTON = 108
+    NOTE_BUTTON = 109
+    CUSTOM_BUTTON = 110
+    CAPTURE_MIDI_BUTTON = 111
     def __init__(self, *args, **kwargs):
         Holophonor.__init__(self, *args, **kwargs)
         self.map = []
@@ -57,25 +57,25 @@ class LaunchpadS(LaunchpadX):
     
     @holoimpl
     def recordLoop(self, loop):
-        self.midi.send_message([NOTE_ON, self.map[loop], RECORDING])
+        self.midi.send_message([NOTE_ON, self.map[loop], self.RECORDING])
         self.loops[loop] = 0
     
     @holoimpl
     def playLoop(self, loop, volume):
-        self.midi.send_message([NOTE_ON, self.map[loop], GREEN[volume >> 5]])
+        self.midi.send_message([NOTE_ON, self.map[loop], self.GREEN[volume >> 5]])
         self.loops[loop] = volume
         if not self.pulse:
             self.pulse = True
-            self.midi.send_message([CONTROL_CHANGE, SESSION_BUTTON, PULSE])
+            self.midi.send_message([CONTROL_CHANGE, self.SESSION_BUTTON, self.PULSE])
     
     @holoimpl
     def recallScene(self, scene: int):
         # need to overwrite LaunchpadX implementation
         # because scene light can't recieve flashing signal
         if self.current_scene != None:
-            self.midi.send_message([CONTROL_CHANGE, SCENES[self.current_scene], STOPPED])
+            self.midi.send_message([CONTROL_CHANGE, self.SCENES[self.current_scene], self.STOPPED])
         self.current_scene = scene
-        self.midi.send_message([CONTROL_CHANGE, SCENES[scene], GREEN[-1]])
+        self.midi.send_message([CONTROL_CHANGE, self.SCENES[scene], self.GREEN[-1]])
         s = self.scenes[scene]
         for l, b in enumerate(self.map):
             if self.loops[l] != None:
