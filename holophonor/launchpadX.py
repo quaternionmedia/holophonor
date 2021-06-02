@@ -205,7 +205,7 @@ class LaunchpadX(Holophonor):
     
     @holoimpl
     def setDrumPatch(self, patch: int):
-        self.midi.send_message([CONTROL_CHANGE, self.DRUM_PATCHES[patch], self.DRUM_PATCH_COLORS[patch]])
+        self.midi.send_message([NOTE_ON, self.DRUM_PATCHES[patch], self.DRUM_PATCH_COLORS[patch]])
         for button in set(self.DRUM_PATCHES) - {self.DRUM_PATCHES[patch]}:
             self.midi.send_message([NOTE_ON, button, EMPTY])
         self.drum_patch = patch
