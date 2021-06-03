@@ -61,11 +61,13 @@ class LaunchpadX(Holophonor):
         for i in range(len(self.DRUM_PATCHES)):
             self.midi.send_message([NOTE_ON, self.DRUM_PATCHES[i], EMPTY])
         self.midi.send_message([NOTE_ON, self.DRUM_PATCHES[self.drum_patch], self.DRUM_PATCH_COLORS[self.drum_patch]])
+        
         self.midi.send_message([CONTROL_CHANGE, 99, 1])
-
         self.midi.send_message([CONTROL_CHANGE, self.UP_ARROW, self.DRUM_BANKS[min(self.drum_bank + 1, 3)]])
         self.midi.send_message([CONTROL_CHANGE, self.DOWN_ARROW, self.DRUM_BANKS[max(self.drum_bank - 1, -1)]])
         self.midi.send_message([CONTROL_CHANGE, self.LEFT_ARROW, STOPPED])
+        self.midi.send_message([CONTROL_CHANGE, self.SESSION_BUTTON, INACTIVE])
+        
     
     def lightDrums(self):
         for i in self.DRUMS:
@@ -183,7 +185,7 @@ class LaunchpadX(Holophonor):
     
     @holoimpl
     def clearPulse(self):
-        self.midi.send_message([CONTROL_CHANGE, self.SESSION_BUTTON, EMPTY])
+        self.midi.send_message([CONTROL_CHANGE, self.SESSION_BUTTON, INACTIVE])
     
     @holoimpl
     def stopAllLoops(self):

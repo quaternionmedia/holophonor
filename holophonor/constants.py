@@ -1,4 +1,5 @@
 EMPTY = 0 # black
+INACTIVE = 1 # grey
 RECORDING = 5 # red
 PLAYING = 21 # green
 STOPPED = 43 # navy
