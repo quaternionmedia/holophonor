@@ -62,6 +62,9 @@ class LaunchpadX(Holophonor):
             self.midi.send_message([NOTE_ON, self.DRUM_PATCHES[i], EMPTY])
         self.midi.send_message([NOTE_ON, self.DRUM_PATCHES[self.drum_patch], self.DRUM_PATCH_COLORS[self.drum_patch]])
         self.midi.send_message([CONTROL_CHANGE, 99, 1])
+
+        self.midi.send_message([CONTROL_CHANGE, self.UP_ARROW, self.DRUM_BANKS[min(self.drum_bank + 1, 3)]])
+        self.midi.send_message([CONTROL_CHANGE, self.DOWN_ARROW, self.DRUM_BANKS[max(self.drum_bank - 1, -1)]])
         self.midi.send_message([CONTROL_CHANGE, self.LEFT_ARROW, STOPPED])
     
     def lightDrums(self):
