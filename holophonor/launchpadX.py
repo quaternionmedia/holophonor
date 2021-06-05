@@ -192,6 +192,8 @@ class LaunchpadX(Holophonor):
         for i, l in enumerate(self.loops):
             if l:
                 self.midi.send_message([NOTE_ON, self.map[i], STOPPED])
+                self.loops[i] = 0
+
         if self.current_scene != None:
             self.midi.send_message([NOTE_ON, self.SCENES[self.current_scene], STOPPED])
             self.current_scene = None
