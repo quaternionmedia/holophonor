@@ -94,6 +94,7 @@ class Fweelin(Holophonor):
         self.midi.send_message([CONTROL_CHANGE, 108, 0])
         self.loops = [None]*NUMBER_LOOPS
         self.scenes = [None]*NUMBER_SCENES
+        self.current_scene = None
     
     @holoimpl
     def tapPulse(self):
