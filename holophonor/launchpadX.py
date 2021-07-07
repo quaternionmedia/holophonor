@@ -122,6 +122,8 @@ class LaunchpadX(Holophonor):
     def recallScene(self, scene: int):
         if self.current_scene != None:
             self.midi.send_message([NOTE_ON, self.SCENES[self.current_scene], STOPPED])
+            if self.scenes[self.current_scene] == -1:
+                self.scenes[self.current_scene] = self.loops.copy()
         self.current_scene = scene
         self.midi.send_message([NOTE_ON | 0x2, self.SCENES[scene], GREEN[-1]])
         s = self.scenes[scene]
@@ -144,10 +146,19 @@ class LaunchpadX(Holophonor):
     @holoimpl
     def storeScene(self, scene: int):
         if self.current_scene != None:
+            # if we are playing a scene currently, stop the light
             self.midi.send_message([NOTE_ON, self.SCENES[self.current_scene], STOPPED])
+            if self.scenes[self.current_scene] == -1:
+                # stop recording, store previous scene
+                self.scenes[self.current_scene] = self.loops.copy()
+                print('storing old scene', self.current_scene, self.scenes[self.current_scene])
+                # also send green light
+                self.midi.send_message([NOTE_ON | 0x2, self.SCENES[scene], GREEN[-1]])
         self.current_scene = scene
-        self.scenes[scene] = self.loops.copy()
-        self.midi.send_message([NOTE_ON, self.SCENES[scene], GREEN[-1]])
+        if self.scenes[scene] == None:
+            self.scenes[scene] = -1
+            self.midi.send_message([NOTE_ON | 0x2, self.SCENES[scene], RECORDING])
+        
     
     @holoimpl
     def eraseScene(self, scene: int):
@@ -297,12 +308,12 @@ class LaunchpadX(Holophonor):
                         self.hook.eraseScene(scene=s)
                     else:
                         # normal (unshifted) mode
-                        if self.scenes[s]:
-                            # recall scene
-                            self.hook.recallScene(scene=s)
-                        else:
+                        if self.scenes[s] in (None, -1):
                             # store scene
                             self.hook.storeScene(scene=s)
+                        else:
+                            # recall scene
+                            self.hook.recallScene(scene=s)
                 else:
                     # scene button released
                     if self.scenes[s] == None:

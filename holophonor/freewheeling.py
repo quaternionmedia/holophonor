@@ -49,6 +49,10 @@ class Fweelin(Holophonor):
         
     @holoimpl
     def recallScene(self, scene: int):
+        if self.current_scene and self.scenes[self.current_scene] == -1:
+            # store changes to old scene
+            self.scenes[self.current_scene] = self.loops.copy()
+            print('freewheeling storing old scene before recall', self.current_scene, self.scenes[self.current_scene])
         self.current_scene = scene
         s = self.scenes[scene]
         for l in range(NUMBER_LOOPS):
@@ -67,8 +71,15 @@ class Fweelin(Holophonor):
                         self.playLoop(l, s[l] if s[l] > 0 else 100)
     @holoimpl
     def storeScene(self, scene: int):
+        if self.current_scene != None and self.scenes[self.current_scene] == -1:
+            # store changes to old scene
+            self.scenes[self.current_scene] = self.loops.copy()
+            print('fweelin storing old scene', self.current_scene, self.scenes[self.current_scene])
         self.current_scene = scene
-        self.scenes[scene] = self.loops.copy()
+        if self.scenes[scene] == None:
+            self.scenes[scene] = -1
+        elif self.scenes[scene] == -1:
+            self.scenes[scene] = self.loops.copy()
     
     @holoimpl
     def eraseScene(self, scene: int):
