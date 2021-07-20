@@ -151,7 +151,6 @@ class LaunchpadX(Holophonor):
             if self.scenes[self.current_scene] == -1:
                 # stop recording, store previous scene
                 self.scenes[self.current_scene] = self.loops.copy()
-                print('storing old scene', self.current_scene, self.scenes[self.current_scene])
                 # also send green light
                 self.midi.send_message([NOTE_ON | 0x2, self.SCENES[scene], GREEN[-1]])
         self.current_scene = scene
