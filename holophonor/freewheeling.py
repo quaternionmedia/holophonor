@@ -49,6 +49,9 @@ class Fweelin(Holophonor):
         
     @holoimpl
     def recallScene(self, scene: int):
+        if self.current_scene and self.scenes[self.current_scene] == -1:
+            # store changes to old scene
+            self.scenes[self.current_scene] = self.loops.copy()
         self.current_scene = scene
         s = self.scenes[scene]
         for l in range(NUMBER_LOOPS):
@@ -67,8 +70,14 @@ class Fweelin(Holophonor):
                         self.playLoop(l, s[l] if s[l] > 0 else 100)
     @holoimpl
     def storeScene(self, scene: int):
+        if self.current_scene != None and self.scenes[self.current_scene] == -1:
+            # store changes to old scene
+            self.scenes[self.current_scene] = self.loops.copy()
         self.current_scene = scene
-        self.scenes[scene] = self.loops.copy()
+        if self.scenes[scene] == None:
+            self.scenes[scene] = -1
+        elif self.scenes[scene] == -1:
+            self.scenes[scene] = self.loops.copy()
     
     @holoimpl
     def eraseScene(self, scene: int):
@@ -94,6 +103,7 @@ class Fweelin(Holophonor):
         self.midi.send_message([CONTROL_CHANGE, 108, 0])
         self.loops = [None]*NUMBER_LOOPS
         self.scenes = [None]*NUMBER_SCENES
+        self.current_scene = None
     
     @holoimpl
     def tapPulse(self):
