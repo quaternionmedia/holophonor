@@ -1,0 +1,118 @@
+[
+  {
+    "repositories": [
+      "quaternionmedia/holophonor",
+      "quaternionmedia/leo",
+      "quaternionmedia/derek",
+      "quaternionmedia/alfred",
+      "quaternionmedia/moe",
+      "quaternionmedia/joe",
+      "quaternionmedia/freewheeling",
+      "quaternionmedia/milestones",
+      "quaternionmedia/fastapi-crudrouter",
+      "quaternionmedia/alfred-docker",
+      "quaternionmedia/ludwig",
+      "quaternionmedia/midiphonor",
+      "quaternionmedia/new-dev-setup",
+      "quaternionmedia/launchchess",
+      "quaternionmedia/launchchess-python",
+      "quaternionmedia/kpl",
+      "quaternionmedia/george",
+      "quaternionmedia/otto",
+      "quaternionmedia/wolf",
+      "quaternionmedia/scad-chess"
+    ],
+    "labels": [
+      {
+        "previousNames": ["bug", "bug :bug:"],
+        "name": "bug 🐛",
+        "color": "d73a4a"
+      },
+      {
+        "previousNames": ["CD", "CD :building_construction:"],
+        "name": "CD 🏗️",
+        "description": "Relating to Continuous Deployment",
+        "color": "732487"
+      },
+      {
+        "previousNames": ["CI", "CI :test_tube:"],
+        "name": "CI 🦾",
+        "description": "Relating to Continuous Integration",
+        "color": "E09B24"
+      },
+      {
+        "previousNames": ["development", "dev"],
+        "name": "development 💻",
+        "description": "Relating to the development enviornment",
+        "color": "30A8E1"
+      },
+      {
+        "previousNames": ["production"],
+        "name": "production 🎭",
+        "description": "Relating to the production deployment",
+        "color": "772b8d"
+      },
+      {
+        "previousNames": ["test"],
+        "name": "test 🧪",
+        "description": "Tests and testing",
+        "color": "38C5D6"
+      },
+      {
+        "previousNames": ["breaking", "breaking :broken_heart:"],
+        "name": "breaking 💔",
+        "description": "Breaking changes",
+        "color": "BF0212"
+      },
+      {
+        "previousNames": ["documentation", "documentation :scroll:"],
+        "name": "documentation 📜",
+        "color": "0075ca"
+      },
+      {
+        "previousNames": ["duplicate", "duplicate :gemini:"],
+        "name": "duplicate ♊",
+        "color": "cfd3d7"
+      },
+      {
+        "previousNames": ["enhancement", "enhancement :heavy_plus_sign:"],
+        "name": "enhancement ➕",
+        "color": "a2eeef"
+      },
+      {
+        "previousNames": [
+          "good first issue",
+          "good first issue :new_moon_with_face:"
+        ],
+        "name": "good first issue 🌚",
+        "color": "7057ff"
+      },
+      {
+        "previousNames": ["help wanted", "help wanted :information_source:"],
+        "name": "help wanted ℹ️",
+        "color": "008672"
+      },
+      {
+        "previousNames": ["invalid", "invalid :exclamation:"],
+        "name": "invalid ❗",
+        "color": "e4e669"
+      },
+      {
+        "previousNames": ["maintenance", "maintenance :wrench:"],
+        "name": "maintenance 🔧",
+        "description": "Updates and upgrades",
+        "color": "F87431"
+      },
+      {
+        "previousNames": ["question", "question :grey_question:"],
+        "name": "question ❔",
+        "color": "d876e3"
+      },
+      {
+        "previousNames": ["wontfix", "wontfix :x:"],
+        "name": "wontfix ✖️",
+        "color": "000000"
+      }
+    ]
+  }
+]
