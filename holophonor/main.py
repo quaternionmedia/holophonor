@@ -16,6 +16,7 @@ def main():
     finally:
         pm.hook.close()
 
+
 def get_plugin_manager():
     pm = PluginManager('holophonor')
     pm.add_hookspecs(Holophonor)
