@@ -2,7 +2,7 @@ from holophonor import holoimpl
 from holophonor.holospecs import Holophonor
 from holophonor.constants import *
 from rtmidi.midiutil import open_midiinput
-from rtmidi.midiconstants import NOTE_ON, CONTROL_CHANGE
+from rtmidi.midiconstants import NOTE_ON, CONTROL_CHANGE, NOTE_OFF
 from rtmidi import API_UNIX_JACK
 import logging as log
 
@@ -424,3 +424,5 @@ class LaunchpadX(Holophonor):
                         elif self.pulse == False:
                             # this also clears the ERASE color from the Session button if shift mode is released first
                             self.hook.clearPulse()
+        if message[0] == NOTE_OFF:
+            log.debug('NOTE OFF detected')
