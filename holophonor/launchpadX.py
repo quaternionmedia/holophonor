@@ -426,3 +426,10 @@ class LaunchpadX(Holophonor):
                             self.hook.clearPulse()
         if message[0] == NOTE_OFF:
             log.debug('NOTE OFF detected')
+            if message[1] in self.map:
+                log.debug('This is a loop button')
+                l = self.map.index(message[1])
+                loop = self.loops[l]
+                if loop == None:
+                    log.debug('Clearing erased loop')
+                    self.clearLoop(loop=l)
