@@ -1,5 +1,6 @@
 from pluggy import HookspecMarker
 from rtmidi.midiutil import open_midioutput
+from rtmidi import API_UNIX_JACK
 
 holospec = HookspecMarker('holophonor')
 
@@ -8,7 +9,9 @@ class Holophonor:
     def __init__(self, hook, port, client_name='holo', plugins=[], **kwargs):
         self.hook = hook
         self.port = port
-        self.midi, self.name = open_midioutput(self.port, client_name=client_name)
+        self.midi, self.name = open_midioutput(
+            self.port, client_name=client_name, api=API_UNIX_JACK
+        )
         self.plugins = plugins
         self.loops = [None] * 32
         self.pulse = False

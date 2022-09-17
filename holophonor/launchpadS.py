@@ -4,6 +4,7 @@ from holophonor.launchpadX import LaunchpadX
 from itertools import chain
 from rtmidi.midiutil import open_midiinput
 from rtmidi.midiconstants import NOTE_ON, CONTROL_CHANGE
+from rtmidi import API_UNIX_JACK
 
 
 class LaunchpadS(LaunchpadX):
@@ -54,7 +55,7 @@ class LaunchpadS(LaunchpadX):
                 self.map.append(n + x)
             n += 16
         self.input, self.input_name = open_midiinput(
-            self.port, client_name='launchpadS->holo'
+            self.port, client_name='launchpadS->holo', api=API_UNIX_JACK
         )
         self.input.set_callback(self)
         self.drum_bank = 0

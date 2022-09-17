@@ -3,6 +3,7 @@ from holophonor.holospecs import Holophonor
 from holophonor.constants import *
 from rtmidi.midiutil import open_midiinput
 from rtmidi.midiconstants import NOTE_ON, CONTROL_CHANGE
+from rtmidi import API_UNIX_JACK
 
 
 class LaunchpadX(Holophonor):
@@ -35,7 +36,7 @@ class LaunchpadX(Holophonor):
         self.live = False
         self.toggleLive()
         self.input, self.input_name = open_midiinput(
-            self.port, client_name='launchpadX->holo'
+            self.port, client_name='launchpadX->holo', api=API_UNIX_JACK
         )
         self.input.set_callback(self)
         self.drum_bank = 0

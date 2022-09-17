@@ -2,6 +2,7 @@ from holophonor.holospecs import Holophonor
 from holophonor import holoimpl
 from rtmidi.midiutil import open_midioutput
 from rtmidi.midiconstants import CONTROL_CHANGE
+from rtmidi import API_UNIX_JACK
 
 FX = [35, 36, 37, 38, 45, 46, 47, 48]
 
@@ -9,7 +10,9 @@ FX = [35, 36, 37, 38, 45, 46, 47, 48]
 class Bitwig:
     def __init__(self, hook, port, client_name='bitwig', **kwargs):
         self.hook = hook
-        self.midi, self.name = open_midioutput(port, client_name=client_name)
+        self.midi, self.name = open_midioutput(
+            port, client_name=client_name, api=API_UNIX_JACK
+        )
         self.fx = [False] * 8
 
     @holoimpl
