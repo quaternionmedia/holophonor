@@ -433,3 +433,12 @@ class LaunchpadX(Holophonor):
                 if loop == None:
                     log.debug('Clearing erased loop')
                     self.clearLoop(loop=l)
+            elif message[1] in self.DRUMS:
+                log.debug('clearing drum note')
+                self.lightButton(
+                    [
+                        NOTE_ON,
+                        message[1],
+                        self.DRUM_BANKS[self.drum_bank],
+                    ]
+                )
