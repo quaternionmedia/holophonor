@@ -8,7 +8,7 @@ import logging as log
 
 
 def main():
-    log.basicConfig(level=log.DEBUG)
+    # log.basicConfig(level=log.DEBUG)
     pm = get_plugin_manager()
     try:
         while True:
@@ -36,7 +36,6 @@ def get_plugin_manager():
             client_name='holo->launchpadX',
         )
     )
-    # pm.register(LaunchpadMK2(pm.hook, 'Launchpad MK2:Launchpad MK2 MIDI 1', client_name='holo->LaunchpadMK2'))
     pm.register(Qsynth(pm.hook, 'ElectricMayhem:midi_00', client_name='holo->qsynth'))
     return pm
 
