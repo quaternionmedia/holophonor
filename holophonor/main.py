@@ -4,9 +4,11 @@ from holophonor.qsynth import Qsynth
 from holophonor.launchpadX import LaunchpadX
 from holophonor.launchpadMK2 import LaunchpadMK2
 from pluggy import PluginManager
+import logging as log
 
 
 def main():
+    log.basicConfig(level=log.DEBUG)
     pm = get_plugin_manager()
     try:
         while True:

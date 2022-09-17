@@ -4,6 +4,7 @@ from holophonor.constants import *
 from rtmidi.midiutil import open_midiinput
 from rtmidi.midiconstants import NOTE_ON, CONTROL_CHANGE
 from rtmidi import API_UNIX_JACK
+import logging as log
 
 
 class LaunchpadX(Holophonor):
@@ -27,6 +28,7 @@ class LaunchpadX(Holophonor):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        log.info('Initializing LaunchpadX')
         self.map = []
         n = 81
         for y in range(4):
@@ -44,6 +46,7 @@ class LaunchpadX(Holophonor):
         self.fx = [False] * 8
         self.clear()
         self.lightDrums()
+        log.info('LaunchpadX ready!')
 
     def toggleLive(self):
         # switch to / from programming / Live mode
@@ -135,11 +138,13 @@ class LaunchpadX(Holophonor):
 
     @holoimpl
     def eraseLoop(self, loop):
+        log.debug(f'erasing loop {loop}')
         self.midi.send_message([NOTE_ON, self.map[loop], ERASE])
         self.loops[loop] = None
 
     @holoimpl
     def clearLoop(self, loop):
+        log.debug(f'clearing loop {loop}')
         self.midi.send_message([NOTE_ON, self.map[loop], EMPTY])
 
     @holoimpl
@@ -284,9 +289,11 @@ class LaunchpadX(Holophonor):
 
     def __call__(self, event, data=None):
         message, deltatime = event
-        print(message)
+        log.info(message)
         if message[0] == NOTE_ON:
+            log.debug(f'NOTE ON detected')
             if message[1] in self.map:
+                log.debug(f'This is a loop button')
                 l = self.map.index(message[1])
                 loop = self.loops[l]
                 if message[2]:
@@ -348,7 +355,7 @@ class LaunchpadX(Holophonor):
                 self.hook.toggleMute(channel=n)
             else:
                 # no matching rule found for note
-                pass
+                log.debug('no matching rule found for note')
         if message[0] in (CONTROL_CHANGE, NOTE_ON):
             # for MK2 compatibility, where scenes are sent as NOTE_ON
             if message[1] in self.SCENES:
