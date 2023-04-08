@@ -4,12 +4,15 @@ from holophonor.qsynth import Qsynth
 from holophonor.launchpadX import LaunchpadX
 from holophonor.launchpadMK2 import LaunchpadMK2
 from pluggy import PluginManager
-import logging as log
+from loguru import logger as log
 
 
 def main():
-    # log.basicConfig(level=log.DEBUG)
+    from sys import stderr, stdout
+
+    log.configure(handlers=[{"sink": stderr, "level": "TRACE"}])
     pm = get_plugin_manager()
+    log.info('Holophonor: ready!')
     try:
         while True:
             input()

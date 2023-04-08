@@ -4,7 +4,7 @@ from holophonor.constants import *
 from rtmidi.midiutil import open_midiinput
 from rtmidi.midiconstants import NOTE_ON, CONTROL_CHANGE, NOTE_OFF
 from rtmidi import API_UNIX_JACK
-import logging as log
+from loguru import logger as log
 
 
 class LaunchpadX(Holophonor):
@@ -312,47 +312,46 @@ class LaunchpadX(Holophonor):
 
     def __call__(self, event, data=None):
         message, deltatime = event
-        log.info(message)
+        log.debug(message)
         if message[0] == NOTE_ON:
-            log.debug(f'NOTE ON detected')
+            log.trace(f'NOTE ON detected')
             if message[1] in self.map:
-                log.debug(f'This is a loop button')
+                log.trace(f'This is a loop button')
                 l = self.map.index(message[1])
                 loop = self.loops[l]
                 if message[2]:
-                    # note on event
+                    log.trace('note on event')
                     if not self.shift:
-                        # normal (unshifted) mode
+                        log.trace('normal (unshifted) mode')
                         if loop == None:
-                            # no existing loop, we are now recording.
+                            log.trace('no existing loop, we are now recording.')
                             self.hook.recordLoop(loop=l, volume=message[2])
                         elif self.cut:
-                            # cut mode
+                            log.trace(f'cut mode. Play loop {l} at volume {message[2]}')
                             self.hook.playLoop(loop=l, volume=message[2])
                         elif self.overdub:
-                            # overdub loop
+                            log.trace(f'overdub loop {l}')
                             if loop != -2:
                                 self.hook.overdubLoop(loop=l)
                             else:
                                 self.hook.playLoop(loop=l, volume=message[2])
-                            # regular mode - no cut, no overdub
+                            log.trace('regular mode - no cut, no overdub')
                         elif loop > 0:
-                            # loop was playing
+                            log.trace('loop was playing')
                             self.hook.stopLoop(loop=l)
                         else:
-                            # loop must be stopped, recording or overdubbing
+                            log.trace('loop must be stopped, recording or overdubbing')
                             self.hook.playLoop(loop=l, volume=message[2])
                     else:
-                        # shift mode
-                        # erase loop
+                        log.trace('shift mode. Erase loop')
                         self.hook.eraseLoop(loop=l)
                 else:
-                    # note off
-                    # button released
+                    log.trace('note off. Button released')
                     if self.loops[l] == None:
-                        # if we erased the loop, clear the color
+                        log.trace('if we erased the loop, clear the color')
                         self.hook.clearLoop(loop=l)
             elif message[1] in self.DRUMS:
+                log.trace('this is a drum button. Playing note')
                 self.hook.playNote(
                     note=[
                         NOTE_ON | 0x9,
@@ -368,96 +367,97 @@ class LaunchpadX(Holophonor):
                     ]
                 )
             elif message[1] in self.FX and message[2]:
+                log.trace('this is an FX button. Toggling FX')
                 f = self.FX.index(message[1])
                 self.hook.toggleFX(fx=f)
             elif message[1] in self.DRUM_PATCHES and message[2]:
+                log.trace('this is a drum patch button. Setting drum patch')
                 i = self.DRUM_PATCHES.index(message[1])
                 self.hook.setDrumPatch(patch=i)
             elif message[1] in self.MUTES and message[2]:
+                log.trace('this is a mute button. Toggling mute')
                 n = self.MUTES.index(message[1])
                 self.hook.toggleMute(channel=n)
             else:
-                # no matching rule found for note
-                log.debug('no matching rule found for note')
+                log.trace(f'no matching rule found for note {message[1]}')
         if message[0] in (CONTROL_CHANGE, NOTE_ON):
             # for MK2 compatibility, where scenes are sent as NOTE_ON
             if message[1] in self.SCENES:
+                log.trace('this is a scene button')
                 s = self.SCENES.index(message[1])
                 if message[2] == 127:
-                    # scene button pressed
+                    log.trace('scene button pressed')
                     if self.shift:
-                        # erase scene
+                        log.trace('shift mode. erase scene')
                         self.hook.eraseScene(scene=s)
                     else:
-                        # normal (unshifted) mode
+                        log.trace('normal (unshifted) mode. store/recall scene')
                         if self.scenes[s] in (None, -1):
-                            # store scene
+                            log.trace('store scene')
                             self.hook.storeScene(scene=s)
                         else:
-                            # recall scene
+                            log.trace('recall scene')
                             self.hook.recallScene(scene=s)
                 else:
-                    # scene button released
+                    log.trace('scene button released')
                     if self.scenes[s] == None:
+                        log.trace('if we erased the scene, clear the color')
                         self.hook.clearScene(scene=s)
         if message[0] == CONTROL_CHANGE:
             if message[1] in self.FUNCTIONS:
                 if message[1] == self.CAPTURE_MIDI_BUTTON:
-                    # capture midi button
-                    # enable shift mode
+                    log.trace(
+                        f'capture midi button {"released" if self.shift else "pressed"}. {"de" if self.shift else ""}activating shift mode'
+                    )
                     self.toggleShift()
                 if self.shift:
                     if message[1] == self.SESSION_BUTTON:
-                        # erase session
-                        # delete pulse
                         if message[2] == 127:
+                            log.trace('erase all loops and pulse')
                             self.hook.deletePulse()
                         else:
+                            log.trace('clearning pulse color')
                             self.hook.clearPulse()
                 else:
                     # normal (unshifted) mode
                     if message[1] == self.UP_ARROW and message[2] == 127:
-                        # arrow up button
-                        # drum bank increment
+                        log.trace('arrow up button. drum bank increment')
                         # not attached to hook
                         # multiple devices can have seperate local banks
                         self.setDrumBank(bank=min(self.drum_bank + 1, 3))
                     elif message[1] == self.DOWN_ARROW and message[2] == 127:
-                        # arrow down button
-                        # drum bank decrement
+                        log.trace('arrow down button. drum bank decrement')
                         self.setDrumBank(bank=max(self.drum_bank - 1, -1))
                     elif message[1] == self.LEFT_ARROW and message[2] == 127:
-                        # left arrow button
+                        log.trace('left arrow button. Stop all loops')
                         self.hook.stopAllLoops()
                     elif message[1] == self.NOTE_BUTTON:
-                        # note button
-                        # momentary cut mode - normal on release
+                        log.trace('note button. toggle cut mode while pressed')
                         # note: because all logic is explicit (playLoop, stopLoop, etc)
                         # all state changes can be purely local!
                         self.toggleCut()
                     elif message[1] == self.CUSTOM_BUTTON and message[2] == 127:
-                        # custom button
-                        # toggle overdub on button press
+                        log.trace('custom button. toggle overdub mode')
                         self.toggleOverdub()
                     elif message[1] == self.SESSION_BUTTON:
-                        # session button
-                        # tap-pulse
                         if message[2] == 127:
+                            log.trace('session button pressed. tap pulse')
                             self.hook.tapPulse()
                         elif self.pulse == False:
-                            # this also clears the ERASE color from the Session button if shift mode is released first
+                            log.trace('session button released. clear pulse')
+                            # this clears the ERASE color from the Session button if shift mode is released first
                             self.hook.clearPulse()
         if message[0] == NOTE_OFF:
-            log.debug('NOTE OFF detected')
+            log.trace('NOTE OFF detected')
             if message[1] in self.map:
-                log.debug('This is a loop button')
+                log.trace('This is a loop button')
                 l = self.map.index(message[1])
                 loop = self.loops[l]
                 if loop == None:
-                    log.debug('Clearing erased loop')
+                    log.trace('Clearing erased loop')
                     self.clearLoop(loop=l)
             elif message[1] in self.DRUMS:
-                log.debug('clearing drum note')
+                log.trace('clearing drum note')
                 self.lightButton(
                     [
                         NOTE_ON,
