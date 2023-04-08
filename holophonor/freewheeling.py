@@ -14,7 +14,7 @@ from time import sleep
 class Fweelin(Holophonor):
     @holoimpl
     def playLoop(self, loop: int, volume: int):
-        if self.loops[loop] and self.loops[loop] != volume:
+        if self.loops[loop] and self.loops[loop] is not volume:
             # loop was playing at a differet volume
             # stop first
             self.stopLoop(loop)
@@ -34,7 +34,7 @@ class Fweelin(Holophonor):
 
     @holoimpl
     def recordLoop(self, loop: int):
-        if self.loops[loop] == None:
+        if self.loops[loop] is None:
             self.playLoop(loop, 127)
             self.loops[loop] = -1
 
@@ -61,9 +61,9 @@ class Fweelin(Holophonor):
         self.current_scene = scene
         s = self.scenes[scene]
         for l in range(NUMBER_LOOPS):
-            if self.loops[l] != None:
+            if self.loops[l] is not None:
                 # loop exists
-                if s[l] != self.loops[l]:
+                if s[l] is not self.loops[l]:
                     # loop needs to be changed
                     if s[l] in (0, None):
                         if self.loops[l]:
@@ -77,11 +77,11 @@ class Fweelin(Holophonor):
 
     @holoimpl
     def storeScene(self, scene: int):
-        if self.current_scene != None and self.scenes[self.current_scene] == -1:
+        if self.current_scene is not None and self.scenes[self.current_scene] == -1:
             # store changes to old scene
             self.scenes[self.current_scene] = self.loops.copy()
         self.current_scene = scene
-        if self.scenes[scene] == None:
+        if self.scenes[scene] is None:
             self.scenes[scene] = -1
         elif self.scenes[scene] == -1:
             self.scenes[scene] = self.loops.copy()

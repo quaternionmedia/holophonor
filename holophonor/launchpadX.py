@@ -112,7 +112,7 @@ class LaunchpadX(Holophonor):
 
     @holoimpl
     def close(self):
-        log.info(f'Closing launchpadX: exiting live mode')
+        log.info('Closing launchpadX: exiting live mode')
 
         # exit programming mode
         self.midi.send_message([240, 0, 32, 41, 2, 12, 14, 0, 247])
@@ -163,7 +163,7 @@ class LaunchpadX(Holophonor):
     @holoimpl
     def recallScene(self, scene: int):
         log.info(f'recalling scene {scene}')
-        if self.current_scene != None:
+        if self.current_scene is not None:
             self.midi.send_message([NOTE_ON, self.SCENES[self.current_scene], STOPPED])
             if self.scenes[self.current_scene] == -1:
                 self.scenes[self.current_scene] = self.loops.copy()
@@ -171,7 +171,7 @@ class LaunchpadX(Holophonor):
         self.midi.send_message([NOTE_ON | 0x2, self.SCENES[scene], GREEN[-1]])
         s = self.scenes[scene]
         for l in range(len(self.map)):
-            if self.loops[l] != None:
+            if self.loops[l] is not None:
                 # loop exists
                 if s[l] != self.loops[l]:
                     # loop needs to be changed
@@ -189,7 +189,7 @@ class LaunchpadX(Holophonor):
     @holoimpl
     def storeScene(self, scene: int):
         log.info(f'storing scene {scene}')
-        if self.current_scene != None:
+        if self.current_scene is not None:
             # if we are playing a scene currently, stop the light
             self.midi.send_message([NOTE_ON, self.SCENES[self.current_scene], STOPPED])
             if self.scenes[self.current_scene] == -1:
@@ -198,7 +198,7 @@ class LaunchpadX(Holophonor):
                 # also send green light
                 self.midi.send_message([NOTE_ON | 0x2, self.SCENES[scene], GREEN[-1]])
         self.current_scene = scene
-        if self.scenes[scene] == None:
+        if self.scenes[scene] is None:
             self.scenes[scene] = -1
             self.midi.send_message([NOTE_ON | 0x2, self.SCENES[scene], RECORDING])
 
@@ -241,7 +241,7 @@ class LaunchpadX(Holophonor):
 
     @holoimpl
     def deletePulse(self):
-        log.info(f'Deleting pulse')
+        log.info('Deleting pulse')
         self.midi.send_message([CONTROL_CHANGE, self.SESSION_BUTTON, ERASE])
         self.clear()
         self.pulse = False
@@ -251,18 +251,18 @@ class LaunchpadX(Holophonor):
 
     @holoimpl
     def clearPulse(self):
-        log.info(f'Clearing pulse')
+        log.info('Clearing pulse')
         self.midi.send_message([CONTROL_CHANGE, self.SESSION_BUTTON, INACTIVE])
 
     @holoimpl
     def stopAllLoops(self):
-        log.info(f'Stopping all loops')
+        log.info('Stopping all loops')
         for i, l in enumerate(self.loops):
             if l:
                 self.midi.send_message([NOTE_ON, self.map[i], STOPPED])
                 self.loops[i] = 0
 
-        if self.current_scene != None:
+        if self.current_scene is not None:
             self.midi.send_message([NOTE_ON, self.SCENES[self.current_scene], STOPPED])
             self.current_scene = None
 
@@ -313,16 +313,16 @@ class LaunchpadX(Holophonor):
         message, deltatime = event
         log.debug(message)
         if message[0] == NOTE_ON:
-            log.trace(f'NOTE ON detected')
+            log.trace('NOTE ON detected')
             if message[1] in self.map:
-                log.trace(f'This is a loop button')
+                log.trace('This is a loop button')
                 l = self.map.index(message[1])
                 loop = self.loops[l]
                 if message[2]:
                     log.trace('note on event')
                     if not self.shift:
                         log.trace('normal (unshifted) mode')
-                        if loop == None:
+                        if loop is None:
                             log.trace('no existing loop, we are now recording.')
                             self.hook.recordLoop(loop=l, volume=message[2])
                         elif self.cut:
@@ -346,7 +346,7 @@ class LaunchpadX(Holophonor):
                         self.hook.eraseLoop(loop=l)
                 else:
                     log.trace('note off. Button released')
-                    if self.loops[l] == None:
+                    if self.loops[l] is None:
                         log.trace('if we erased the loop, clear the color')
                         self.hook.clearLoop(loop=l)
             elif message[1] in self.DRUMS:
@@ -399,7 +399,7 @@ class LaunchpadX(Holophonor):
                             self.hook.recallScene(scene=s)
                 else:
                     log.trace('scene button released')
-                    if self.scenes[s] == None:
+                    if self.scenes[s] is None:
                         log.trace('if we erased the scene, clear the color')
                         self.hook.clearScene(scene=s)
         if message[0] == CONTROL_CHANGE:
@@ -442,7 +442,7 @@ class LaunchpadX(Holophonor):
                         if message[2] == 127:
                             log.trace('session button pressed. tap pulse')
                             self.hook.tapPulse()
-                        elif self.pulse == False:
+                        elif self.pulse is False:
                             log.trace('session button released. clear pulse')
                             # this clears the ERASE color from the Session button if shift mode is released first
                             self.hook.clearPulse()
@@ -452,7 +452,7 @@ class LaunchpadX(Holophonor):
                 log.trace('This is a loop button')
                 l = self.map.index(message[1])
                 loop = self.loops[l]
-                if loop == None:
+                if loop is None:
                     log.trace('Clearing erased loop')
                     self.clearLoop(loop=l)
             elif message[1] in self.DRUMS:
