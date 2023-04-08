@@ -1,0 +1,25 @@
+[tool.pdm]
+
+[project]
+name = "holophonor"
+version = "0.1.0"
+description = "Live looping, unlimited!"
+authors = [
+    {name = "Quaternion Media", email = "holophonor@quaternion.media"},
+]
+dependencies = [
+    "pluggy<1.1,>=1.0.0",
+    "python-rtmidi<1.5,>=1.4.9",
+    "loguru>=0.6.0",
+]
+requires-python = ">=3.8.1, < 4"
+readme = "README.md"
+license = {text = "MIT"}
+
+[project.scripts]
+holophonor = "holophonor.main:main"
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
