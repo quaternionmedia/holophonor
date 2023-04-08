@@ -1,3 +1,4 @@
+from _version import __version__
 from pluggy import HookimplMarker
 
 holoimpl = HookimplMarker("holophonor")
