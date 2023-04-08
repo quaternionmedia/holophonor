@@ -1,0 +1,7 @@
+name: 🐶 Ruff linter
+on: [push, pull_request]
+
+jobs:
+  ruff:
+    name: 🦮 Lint codebase with Ruff
+    uses: quaternionmedia/.github/.github/workflows/ruff.yml@main
