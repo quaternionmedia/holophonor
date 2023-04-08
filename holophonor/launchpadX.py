@@ -112,20 +112,20 @@ class LaunchpadX(Holophonor):
 
     @holoimpl
     def close(self):
-        log.debug(f'Closing launchpadX: exiting live mode')
+        log.info(f'Closing launchpadX: exiting live mode')
 
         # exit programming mode
         self.midi.send_message([240, 0, 32, 41, 2, 12, 14, 0, 247])
 
     @holoimpl
     def recordLoop(self, loop):
-        log.debug(f'recording loop {loop}')
+        log.info(f'recording loop {loop}')
         self.midi.send_message([NOTE_ON | 0x2, self.map[loop], RECORDING])
         self.loops[loop] = -1
 
     @holoimpl
     def playLoop(self, loop, volume):
-        log.debug(f'playing loop {loop} at {volume}')
+        log.info(f'playing loop {loop} at {volume}')
 
         self.midi.send_message(
             [NOTE_ON | 0x2, self.map[loop], GREEN[(volume if volume > 0 else 100) >> 4]]
@@ -138,31 +138,31 @@ class LaunchpadX(Holophonor):
 
     @holoimpl
     def stopLoop(self, loop):
-        log.debug(f'stopping loop {loop}')
+        log.info(f'stopping loop {loop}')
         self.midi.send_message([NOTE_ON, self.map[loop], STOPPED])
         self.loops[loop] = 0
 
     @holoimpl
     def eraseLoop(self, loop):
-        log.debug(f'erasing loop {loop}')
+        log.info(f'erasing loop {loop}')
         self.midi.send_message([NOTE_ON, self.map[loop], ERASE])
         self.loops[loop] = None
 
     @holoimpl
     def clearLoop(self, loop):
-        log.debug(f'clearing loop {loop}')
+        log.info(f'clearing loop {loop}')
         self.midi.send_message([NOTE_ON, self.map[loop], EMPTY])
 
     @holoimpl
     def overdubLoop(self, loop: int):
-        log.debug(f'overdubbing loop {loop}')
+        log.info(f'overdubbing loop {loop}')
         if self.loops[loop] != -2:
             self.midi.send_message([NOTE_ON, self.map[loop], RECORDING])
             self.loops[loop] = -2
 
     @holoimpl
     def recallScene(self, scene: int):
-        log.debug(f'recalling scene {scene}')
+        log.info(f'recalling scene {scene}')
         if self.current_scene != None:
             self.midi.send_message([NOTE_ON, self.SCENES[self.current_scene], STOPPED])
             if self.scenes[self.current_scene] == -1:
@@ -188,7 +188,7 @@ class LaunchpadX(Holophonor):
 
     @holoimpl
     def storeScene(self, scene: int):
-        log.debug(f'storing scene {scene}')
+        log.info(f'storing scene {scene}')
         if self.current_scene != None:
             # if we are playing a scene currently, stop the light
             self.midi.send_message([NOTE_ON, self.SCENES[self.current_scene], STOPPED])
@@ -204,7 +204,7 @@ class LaunchpadX(Holophonor):
 
     @holoimpl
     def eraseScene(self, scene: int):
-        log.debug(f'erasing scene {scene}')
+        log.info(f'erasing scene {scene}')
         self.midi.send_message([NOTE_ON, self.SCENES[scene], ERASE])
         self.scenes[scene] = None
         if self.current_scene == scene:
@@ -212,37 +212,36 @@ class LaunchpadX(Holophonor):
 
     @holoimpl
     def clearScene(self, scene: int):
-        log.debug(f'clearing scene {scene}')
+        log.info(f'clearing scene {scene}')
         self.midi.send_message([NOTE_ON, self.SCENES[scene], EMPTY])
 
     @holoimpl
     def toggleShift(self):
-        log.debug(f'Toggling shift mode from {self.shift}')
         self.shift = not self.shift
+        log.info(f'Toggling shift mode: {self.shift}')
         self.midi.send_message(
             [CONTROL_CHANGE, self.CAPTURE_MIDI_BUTTON, ERASE if self.shift else 0]
         )
 
     @holoimpl
     def toggleCut(self):
-        log.debug(f'Toggling cut mode from {self.cut}')
         self.cut = not self.cut
+        log.info(f'Toggling cut mode: {self.cut}')
         self.midi.send_message(
             [CONTROL_CHANGE, self.NOTE_BUTTON, CUT if self.cut else 0]
         )
 
     @holoimpl
     def toggleOverdub(self):
-        log.debug(f'Toggling overdub mode from {self.overdub}')
-
         self.overdub = not self.overdub
+        log.info(f'Toggling overdub mode: {self.overdub}')
         self.midi.send_message(
             [CONTROL_CHANGE, self.CUSTOM_BUTTON, RECORDING if self.overdub else 0]
         )
 
     @holoimpl
     def deletePulse(self):
-        log.debug(f'Deleting pulse')
+        log.info(f'Deleting pulse')
         self.midi.send_message([CONTROL_CHANGE, self.SESSION_BUTTON, ERASE])
         self.clear()
         self.pulse = False
@@ -252,12 +251,12 @@ class LaunchpadX(Holophonor):
 
     @holoimpl
     def clearPulse(self):
-        log.debug(f'Clearing pulse')
+        log.info(f'Clearing pulse')
         self.midi.send_message([CONTROL_CHANGE, self.SESSION_BUTTON, INACTIVE])
 
     @holoimpl
     def stopAllLoops(self):
-        log.debug(f'Stopping all loops')
+        log.info(f'Stopping all loops')
         for i, l in enumerate(self.loops):
             if l:
                 self.midi.send_message([NOTE_ON, self.map[i], STOPPED])
@@ -269,7 +268,7 @@ class LaunchpadX(Holophonor):
 
     @holoimpl
     def tapPulse(self):
-        log.debug('tap pulse pressed')
+        log.info('tap pulse pressed')
         self.tap = not self.tap
         self.midi.send_message(
             [CONTROL_CHANGE, self.SESSION_BUTTON, TAP if self.tap else PULSE]
@@ -280,7 +279,7 @@ class LaunchpadX(Holophonor):
 
     @holoimpl
     def toggleMute(self, channel: int):
-        log.debug(f'Toggling mute on channel {channel}')
+        log.info(f'{"un" if self.mutes[channel] else ""}muting channel {channel}')
         self.midi.send_message(
             [NOTE_ON, self.MUTES[channel], RECORDING if self.mutes[channel] else EMPTY]
         )
@@ -288,7 +287,7 @@ class LaunchpadX(Holophonor):
 
     @holoimpl
     def toggleFX(self, fx: int):
-        log.debug(f'Toggling fx {fx}')
+        log.info(f'{"de" if self.fx[fx] else ""}activating fx {fx}')
         self.midi.send_message(
             [NOTE_ON, self.FX[fx], EMPTY if self.fx[fx] else self.FX[fx]]
         )
@@ -296,7 +295,7 @@ class LaunchpadX(Holophonor):
 
     @holoimpl
     def setDrumPatch(self, patch: int):
-        log.debug(f'setting drum patch {patch}')
+        log.info(f'setting drum patch {patch}')
         self.midi.send_message(
             [NOTE_ON, self.DRUM_PATCHES[patch], self.DRUM_PATCH_COLORS[patch]]
         )
@@ -306,7 +305,7 @@ class LaunchpadX(Holophonor):
 
     @holoimpl
     def setDrumBank(self, bank: int):
-        log.debug(f'Setting drum bank {bank}')
+        log.info(f'Setting drum bank {bank}')
         self.drum_bank = bank
         self.lightDrums()
 
