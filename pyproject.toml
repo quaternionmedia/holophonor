@@ -1,8 +1,6 @@
-[tool.pdm]
-
 [project]
 name = "holophonor"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Live looping, unlimited!"
 authors = [
     {name = "Quaternion Media", email = "holophonor@quaternion.media"},
@@ -17,7 +15,12 @@ readme = "README.md"
 license = {text = "MIT"}
 
 [project.scripts]
-holophonor = "holophonor.main:main"
+holophonor = "holophonor.main.py"
+
+
+[tool.pdm]
+version = { source = "file", path = "holophonor/_version.py" }
+
 
 [build-system]
 requires = ["pdm-backend"]
