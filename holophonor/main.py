@@ -10,9 +10,9 @@ from loguru import logger as log
 def main():
     from sys import stderr
 
-    log.configure(handlers=[{"sink": stderr, "level": "TRACE"}])
+    log.configure(handlers=[{'sink': stderr, 'level': 'TRACE'}])
     pm = get_plugin_manager()
-    log.info('Holophonor: ready!')
+    log.success('Holophonor: ready!')
     try:
         while True:
             input()

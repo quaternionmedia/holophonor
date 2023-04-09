@@ -3,4 +3,4 @@ dist/
 
 __pypackages__/
 
-.pdm.toml
+.pdm-python
