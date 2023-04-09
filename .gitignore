@@ -1,1 +1,6 @@
-holophonor.egg*
+build/
+dist/
+
+__pypackages__/
+
+.pdm.toml
