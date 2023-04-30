@@ -1777,12 +1777,17 @@ void LoopManager::TapPulse(int pulseindex, char newlen) {
         cur->stopped = 0;
       }
 
-      if (nextdownbeat)
+      // if (nextdownbeat)
         // Tap to beginning- with wrap
-        cur->Wrap();
-      else
+        cur->SetLCcur(cur->GetLongCount_Len());
+        // cur->SetPos(cur->GetLength());
+        // for (int i = 0; i < cur->GetLongCount_Len() - cur->GetLongCount_Cur(); i++) {
+          printf("wrapping\n");
+          cur->Wrap();
+        // }
+      // else
         // Tap to beginning- no wrap
-        cur->SetPos(0);
+        // cur->SetPos(0);
 
       // Notify external transport that we have moved
       app->getAUDIO()->RelocateTransport(0);

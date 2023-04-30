@@ -419,6 +419,7 @@ public:
 
   // Set length of pulse in frames
   inline void SetLength(nframes_t newlen) { len = newlen; };
+  inline void SetLCcur(int lc) { lc_cur = lc; };
 
   // Get current position in %
   inline float GetPct() { return (float)curpos/len; };
