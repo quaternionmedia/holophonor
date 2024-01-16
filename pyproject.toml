@@ -2,25 +2,17 @@
 name = "holophonor"
 dynamic = ["version"]
 description = "Live looping, unlimited!"
-authors = [
-    {name = "Quaternion Media", email = "holophonor@quaternion.media"},
-]
-dependencies = [
-    "pluggy~=1.0",
-    "python-rtmidi~=1.4",
-    "loguru~=0.6",
-]
+authors = [{ name = "Quaternion Media", email = "holophonor@quaternion.media" }]
+dependencies = ["pluggy~=1.0", "python-rtmidi~=1.4", "loguru~=0.6"]
 requires-python = ">=3.8.1, < 4"
 readme = "README.md"
-license = {text = "MIT"}
-
-[project.scripts]
-holophonor = "holophonor.main.py"
-
+license = { text = "MIT" }
 
 [tool.pdm]
 version = { source = "file", path = "holophonor/_version.py" }
 
+[project.scripts]
+holophonor = "holophonor.main:main"
 
 [build-system]
 requires = ["pdm-backend"]
@@ -31,10 +23,10 @@ ignore = [
     # line too long
     "E501",
     # Ambiguous variable names
-    "E741", 
+    "E741",
     # imported but unused
     "F401",
-    # star imports 
+    # star imports
     "F403",
     "F405",
-    ]
+]
