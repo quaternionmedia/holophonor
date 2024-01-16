@@ -5,3 +5,5 @@ jobs:
   ruff:
     name: 🦮 Lint codebase with Ruff
     uses: quaternionmedia/.github/.github/workflows/ruff.yml@main
+    with:
+      args: .
