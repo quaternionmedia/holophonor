@@ -8,7 +8,7 @@ from loguru import logger as log
 
 
 def main():
-    from sys import stderr, stdout
+    from sys import stderr
 
     log.configure(handlers=[{"sink": stderr, "level": "TRACE"}])
     pm = get_plugin_manager()

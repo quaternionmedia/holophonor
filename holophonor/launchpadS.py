@@ -86,7 +86,7 @@ class LaunchpadS(LaunchpadX):
     def recallScene(self, scene: int):
         # need to overwrite LaunchpadX implementation
         # because scene light can't recieve flashing signal
-        if self.current_scene != None:
+        if self.current_scene is not None:
             self.midi.send_message(
                 [CONTROL_CHANGE, self.SCENES[self.current_scene], self.STOPPED]
             )
@@ -94,7 +94,7 @@ class LaunchpadS(LaunchpadX):
         self.midi.send_message([CONTROL_CHANGE, self.SCENES[scene], self.GREEN[-1]])
         s = self.scenes[scene]
         for l, b in enumerate(self.map):
-            if self.loops[l] != None:
+            if self.loops[l] is not None:
                 # loop exists
                 if s[l] != self.loops[l]:
                     # loop needs to be changed
@@ -103,7 +103,7 @@ class LaunchpadS(LaunchpadX):
                             # stop loop
                             self.stopLoop(l)
                             self.loops[l] = 0
-                    elif s[l] != None and self.loops[l] == 0:
+                    elif s[l] is not None and self.loops[l] == 0:
                         # start loop
                         self.playLoop(l, s[l])
                     else:
