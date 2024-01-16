@@ -46,7 +46,7 @@ class LaunchpadX(Holophonor):
         self.fx = [False] * 8
         self.clear()
         self.lightDrums()
-        log.info('LaunchpadX ready!')
+        log.success('LaunchpadX ready!')
 
     def toggleLive(self):
         # switch to / from programming / Live mode

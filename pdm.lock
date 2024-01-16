@@ -35,8 +35,9 @@ requires_python = ">=3.5"
 summary = "A small Python utility to set file creation time on Windows"
 
 [metadata]
-lock_version = "4.1"
-content_hash = "sha256:0dac04ec05d7cff69201d89fc339c48e43d1922c26b50e573e408e31143da4e3"
+lock_version = "4.2"
+groups = ["default"]
+content_hash = "sha256:b092edb0b777784b803f3663d88adc3f50216e5458a578f95202c99de421391c"
 
 [metadata.files]
 "colorama 0.4.6" = [

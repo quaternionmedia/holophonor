@@ -1,9 +1,12 @@
-name: 🐶 Ruff linter
+name: 🧪 Integration Tests
+
 on: [push, pull_request]
 
 jobs:
-  ruff:
+  lint:
     name: 🦮 Lint codebase with Ruff
     uses: quaternionmedia/.github/.github/workflows/ruff.yml@main
-    with:
-      args: .
+
+  black:
+    name: 🖤 Black
+    uses: quaternionmedia/.github/.github/workflows/black.yml@main
