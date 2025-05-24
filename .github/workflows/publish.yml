@@ -1,0 +1,14 @@
+name: 📖 Publish to PyPi
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  publish:
+    name: 🗞 Build and publish package to PyPi
+    uses: quaternionmedia/.github/.github/workflows/publish.yml@main
+    secrets:
+      token: ${{ secrets.PYPI_TOKEN }}
