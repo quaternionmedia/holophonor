@@ -17,8 +17,10 @@ def main():
     try:
         while True:
             input()
+    except KeyboardInterrupt:
+        log.info('Holophonor: exiting...')
     except Exception as e:
-        print(e)
+        log.error(f'Holophonor: error: {e}')
     finally:
         pm.hook.close()
 

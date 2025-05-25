@@ -4,8 +4,12 @@ class HolophonorException(Exception):
 
 class LoopNotFoundException(HolophonorException):
     """Exception raised when a loop is not found."""
-    pass
+    ...
 
 class SceneNotFoundException(HolophonorException):
     """Exception raised when a scene is not found."""
+    pass
+
+class ProcessNotFoundException(HolophonorException):
+    """Exception raised when a running process is not found."""
     pass
