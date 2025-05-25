@@ -1,11 +1,36 @@
 from holophonor import holoimpl
 from holophonor.holospecs import Holophonor
-
+from holophonor.exceptions import *
+from pipewire_python.controller import Controller
+import asyncio
+from datetime import datetime
+from loguru import logger as log
 
 class Pipewire(Holophonor):
+    '''Pipewire implementation of the Holophonor interface'''
+    def __init__(self, *args, **kwargs):
+        # super().__init__(*args, **kwargs)
+        self.pw = Controller()
+        self.pw.set_config(rate=48000,
+                            channels=2,
+                            _format='s32',
+                            volume=1.0,
+                            latency='64',
+                            quality=4)
+        self.event_loop = asyncio.get_event_loop()
+        self.loops = [None] * 32
+
+
     @holoimpl
     def playLoop(self, loop: int, volume: int):
         '''play loop at volume'''
+        filename = self.loops[loop]
+        if filename is None:
+            raise LoopNotFoundException(f'Loop {loop} is not recorded')
+        log.info(f'Playing loop {loop} at volume {volume}')
+        self.pw.set_config(volume=volume/127.0)
+        log.debug(f'Playing loop {filename}')
+        self.event_loop.run_in_executor(None, self.pw.playback, filename)
 
     @holoimpl
     def stopLoop(self, loop: int):
@@ -14,6 +39,9 @@ class Pipewire(Holophonor):
     @holoimpl
     def recordLoop(self, loop: int):
         '''record loop'''
+        filename = f'{datetime.now().isoformat()}.wav'
+        self.event_loop.run_in_executor(None, self.pw.record, filename)
+        self.loops[loop] = filename
 
     @holoimpl
     def eraseLoop(self, loop: int):
