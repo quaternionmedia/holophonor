@@ -7,21 +7,19 @@ from datetime import datetime
 from loguru import logger as log
 from psutil import process_iter
 
+
 class Pipewire(Holophonor):
     '''Pipewire implementation of the Holophonor interface'''
+
     def __init__(self, *args, **kwargs):
         # super().__init__(*args, **kwargs)
         self.pw = Controller()
-        self.pw.set_config(rate=48000,
-                            channels=2,
-                            _format='s32',
-                            volume=1.0,
-                            latency='64',
-                            quality=4)
+        self.pw.set_config(
+            rate=48000, channels=2, _format='s32', volume=1.0, latency='64', quality=4
+        )
         self.event_loop = asyncio.get_event_loop()
         self.loops = [None] * 32
         self.recordings = {}
-
 
     @holoimpl
     def playLoop(self, loop: int, volume: int):
@@ -30,11 +28,13 @@ class Pipewire(Holophonor):
         if filename is None:
             raise LoopNotFoundException(f'Loop {loop} is not recorded')
         if self.recordings.get(loop):
-            log.debug(f'Loop {loop} is currently being recorded, stopping recording first')
+            log.debug(
+                f'Loop {loop} is currently being recorded, stopping recording first'
+            )
             self.recordings[loop].kill()
             del self.recordings[loop]
         log.info(f'Playing loop {loop} at volume {volume}')
-        self.pw.set_config(volume=volume/127.0)
+        self.pw.set_config(volume=volume / 127.0)
         log.debug(f'Playing loop {filename}')
         self.event_loop.run_in_executor(None, self.pw.playback, filename)
 
@@ -54,7 +54,9 @@ class Pipewire(Holophonor):
                     log.debug(f'Found PipeWire process: {proc}')
                     self.recordings[loop] = proc
                     return
-        raise ProcessNotFoundException(f'No PipeWire process found for loop {loop} recording')
+        raise ProcessNotFoundException(
+            f'No PipeWire process found for loop {loop} recording'
+        )
 
     @holoimpl
     def eraseLoop(self, loop: int):

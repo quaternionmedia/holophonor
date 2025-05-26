@@ -38,7 +38,8 @@ class LaunchpadX(Holophonor):
         self.live = False
         self.toggleLive()
         self.input, self.input_name = open_midiinput(
-            self.port, client_name='launchpadX->holo', #api=API_UNIX_JACK
+            self.port,
+            client_name='launchpadX->holo',  # api=API_UNIX_JACK
         )
         self.input.set_callback(self)
         self.drum_bank = 0

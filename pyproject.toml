@@ -8,9 +8,6 @@ requires-python = ">=3.8.1, < 4"
 readme = "README.md"
 license = { text = "MIT" }
 
-[tool.pdm]
-version = { source = "file", path = "holophonor/_version.py" }
-
 [project.scripts]
 holophonor = "holophonor.main:main"
 
@@ -30,3 +27,10 @@ ignore = [
     "F403",
     "F405",
 ]
+
+[tool.pdm]
+version = { source = "file", path = "holophonor/_version.py" }
+
+
+[dependency-groups]
+dev = ["black>=24.8.0"]
