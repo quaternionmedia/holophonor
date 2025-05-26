@@ -19,7 +19,31 @@ class Pipewire(Holophonor):
         )
         self.event_loop = asyncio.get_event_loop()
         self.loops = [None] * 32
-        self.recordings = {}
+        self.recording = {}
+    
+    def _find_process(self, filename: str):
+        '''Find a process by filename'''
+        for proc in process_iter(['pid', 'cmdline']):
+            if proc.name() == 'pw-cat':
+                if proc.cmdline()[2] == filename:
+                    log.debug(f'Found PipeWire process: {proc}')
+                    return proc
+        raise ProcessNotFoundException(
+            f'No PipeWire process found for loop {loop} recording'
+        )
+
+    def _play(self, loop: int, volume: int, repeat: int = -1):
+        '''Play a file using PipeWire'''
+        filename = self.loops[loop]
+        try:
+            while repeat != 0 and self.loops[loop] == filename:
+                log.debug(f'Playing {filename} at {volume=} with {repeat=}x')
+                self.pw.playback(filename)
+                repeat -= 1
+        except Exception as e:
+            log.error(f'Error playing {filename}: {e}')
+        finally:
+            log.debug(f'Finished playing {filename}')
 
     @holoimpl
     def playLoop(self, loop: int, volume: int):
@@ -27,20 +51,23 @@ class Pipewire(Holophonor):
         filename = self.loops[loop]
         if filename is None:
             raise LoopNotFoundException(f'Loop {loop} is not recorded')
-        if self.recordings.get(loop):
+        if self.recording.get(loop):
             log.debug(
                 f'Loop {loop} is currently being recorded, stopping recording first'
             )
-            self.recordings[loop].kill()
-            del self.recordings[loop]
+            self.recording[loop].kill()
+            del self.recording[loop]
         log.info(f'Playing loop {loop} at volume {volume}')
-        self.pw.set_config(volume=volume / 127.0)
-        log.debug(f'Playing loop {filename}')
-        self.event_loop.run_in_executor(None, self.pw.playback, filename)
+        self.event_loop.run_in_executor(None, self._play, loop, volume)
+        self.loops[loop] = filename
 
     @holoimpl
     def stopLoop(self, loop: int):
         '''pause loop'''
+        if self.loops[loop] is None:
+            raise LoopNotFoundException(f'Loop {loop} is not playing')
+        log.info(f'Stopping loop {loop}')
+        self._find_process(self.loops[loop]).kill()
 
     @holoimpl
     def recordLoop(self, loop: int):
@@ -48,15 +75,8 @@ class Pipewire(Holophonor):
         filename = f'{datetime.now().isoformat()}.wav'
         self.event_loop.run_in_executor(None, self.pw.record, filename, -1, True)
         self.loops[loop] = filename
-        for proc in process_iter(['pid', 'cmdline']):
-            if proc.name().startswith('pw-cat'):
-                if proc.cmdline()[2] == filename:
-                    log.debug(f'Found PipeWire process: {proc}')
-                    self.recordings[loop] = proc
-                    return
-        raise ProcessNotFoundException(
-            f'No PipeWire process found for loop {loop} recording'
-        )
+        self.recording[loop] = self._find_process(filename)
+
 
     @holoimpl
     def eraseLoop(self, loop: int):
