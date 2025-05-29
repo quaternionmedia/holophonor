@@ -21,6 +21,7 @@ def main():
         log.info('Holophonor: exiting...')
     except Exception as e:
         log.error(f'Holophonor: error: {e}')
+        raise
     finally:
         pm.hook.close()
 

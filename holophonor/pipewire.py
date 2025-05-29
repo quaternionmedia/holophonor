@@ -6,21 +6,25 @@ import asyncio
 from datetime import datetime
 from loguru import logger as log
 from psutil import process_iter
+from os import path
+from multiprocessing import Process
 
 
 class Pipewire(Holophonor):
     '''Pipewire implementation of the Holophonor interface'''
 
     def __init__(self, *args, **kwargs):
-        # super().__init__(*args, **kwargs)
+        self.RECORDING_DIR = kwargs.get('RECORDING_DIR', 'recordings')
+
         self.pw = Controller()
         self.pw.set_config(
             rate=48000, channels=2, _format='s32', volume=1.0, latency='64', quality=4
         )
         self.event_loop = asyncio.get_event_loop()
         self.loops = [None] * 32
+        self.playing = {}
         self.recording = {}
-    
+
     def _find_process(self, filename: str):
         '''Find a process by filename'''
         for proc in process_iter(['pid', 'cmdline']):
@@ -37,11 +41,10 @@ class Pipewire(Holophonor):
         filename = self.loops[loop]
         try:
             while repeat != 0 and self.loops[loop] == filename:
+                self.pw.set_config(volume=volume / 127.0)
                 log.debug(f'Playing {filename} at {volume=} with {repeat=}x')
                 self.pw.playback(filename)
                 repeat -= 1
-        except Exception as e:
-            log.error(f'Error playing {filename}: {e}')
         finally:
             log.debug(f'Finished playing {filename}')
 
@@ -55,28 +58,38 @@ class Pipewire(Holophonor):
             log.debug(
                 f'Loop {loop} is currently being recorded, stopping recording first'
             )
-            self.recording[loop].kill()
+            # self.recording[loop].terminate()
+            proc = self._find_process(filename)
+            log.debug(f'Stopping recording process: {proc}')
+            proc.kill()
             del self.recording[loop]
         log.info(f'Playing loop {loop} at volume {volume}')
-        self.event_loop.run_in_executor(None, self._play, loop, volume)
-        self.loops[loop] = filename
+        task = Process(target=self._play, args=(loop, volume, -1), daemon=True)
+        task.start()
+        self.playing[loop] = task
 
     @holoimpl
     def stopLoop(self, loop: int):
         '''pause loop'''
-        if self.loops[loop] is None:
+        filename = self.loops[loop]
+        if filename is None:
             raise LoopNotFoundException(f'Loop {loop} is not playing')
         log.info(f'Stopping loop {loop}')
-        self._find_process(self.loops[loop]).kill()
+        self.playing[loop].terminate()
+        log.debug(f'Stopped loop {loop}')
+        del self.playing[loop]
+        proc = self._find_process(filename)
+        log.debug(f'Stopping playing loop process {proc=}')
+        proc.kill()
 
     @holoimpl
     def recordLoop(self, loop: int):
         '''record loop'''
-        filename = f'{datetime.now().isoformat()}.wav'
-        self.event_loop.run_in_executor(None, self.pw.record, filename, -1, True)
+        filename = path.join(self.RECORDING_DIR, f'{datetime.now().isoformat()}.wav')
         self.loops[loop] = filename
-        self.recording[loop] = self._find_process(filename)
-
+        task = Process(target=self.pw.record, args=(filename, -1, True), daemon=True)
+        task.start()
+        self.recording[loop] = task
 
     @holoimpl
     def eraseLoop(self, loop: int):
