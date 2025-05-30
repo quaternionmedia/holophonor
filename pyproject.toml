@@ -3,7 +3,7 @@ name = "holophonor"
 dynamic = ["version"]
 description = "Live looping, unlimited!"
 authors = [{ name = "Quaternion Media", email = "holophonor@quaternion.media" }]
-dependencies = ["pluggy~=1.0", "python-rtmidi~=1.4", "loguru~=0.6"]
+dependencies = ["pluggy~=1.0", "python-rtmidi~=1.4", "loguru~=0.6", "pipewire-python>=0.2.3"]
 requires-python = ">=3.8.1, < 4"
 readme = "README.md"
 license = { text = "MIT" }
