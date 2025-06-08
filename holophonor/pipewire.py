@@ -8,6 +8,7 @@ from loguru import logger as log
 from psutil import process_iter
 from os import path
 from multiprocessing import Process
+from subprocess import run
 
 
 class Pipewire(Holophonor):
@@ -25,11 +26,11 @@ class Pipewire(Holophonor):
         self.playing = {}
         self.recording = {}
 
-    def _find_process(self, filename: str):
+    def _find_process(self, process, filename: str):
         '''Find a process by filename'''
         for proc in process_iter(['pid', 'cmdline']):
-            if proc.name() == 'pw-cat':
-                if proc.cmdline()[2] == filename:
+            if proc.name() == process:
+                if filename in proc.cmdline():
                     log.debug(f'Found PipeWire process: {proc}')
                     return proc
         raise ProcessNotFoundException(
@@ -39,14 +40,7 @@ class Pipewire(Holophonor):
     def _play(self, loop: int, volume: int, repeat: int = -1):
         '''Play a file using PipeWire'''
         filename = self.loops[loop]
-        try:
-            while repeat != 0 and self.loops[loop] == filename:
-                self.pw.set_config(volume=volume / 127.0)
-                log.debug(f'Playing {filename} at {volume=} with {repeat=}x')
-                self.pw.playback(filename)
-                repeat -= 1
-        finally:
-            log.debug(f'Finished playing {filename}')
+        run(['./uphonor', filename, f'{volume / 127.0}'])
 
     @holoimpl
     def playLoop(self, loop: int, volume: int):
@@ -58,8 +52,8 @@ class Pipewire(Holophonor):
             log.debug(
                 f'Loop {loop} is currently being recorded, stopping recording first'
             )
-            # self.recording[loop].terminate()
-            proc = self._find_process(filename)
+            self.recording[loop].terminate()
+            proc = self._find_process('pw-cat', filename)
             log.debug(f'Stopping recording process: {proc}')
             proc.kill()
             del self.recording[loop]
@@ -78,7 +72,7 @@ class Pipewire(Holophonor):
         self.playing[loop].terminate()
         log.debug(f'Stopped loop {loop}')
         del self.playing[loop]
-        proc = self._find_process(filename)
+        proc = self._find_process('uphonor', filename)
         log.debug(f'Stopping playing loop process {proc=}')
         proc.kill()
 
