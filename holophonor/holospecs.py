@@ -10,7 +10,8 @@ class Holophonor:
         self.hook = hook
         self.port = port
         self.midi, self.name = open_midioutput(
-            self.port, client_name=client_name, api=API_UNIX_JACK
+            self.port,
+            client_name=client_name,  # api=API_UNIX_JACK
         )
         self.plugins = plugins
         self.loops = [None] * 32
