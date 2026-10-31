@@ -5,8 +5,8 @@ on: [push, pull_request]
 jobs:
   lint:
     name: 🦮 Lint codebase with Ruff
-    uses: quaternionmedia/.github/.github/workflows/ruff.yml@main
+    uses: quaternionmedia/.github/.github/workflows/ruff.yml@fix/ruff-check-and-python-input
 
   black:
     name: 🖤 Black
-    uses: quaternionmedia/.github/.github/workflows/black.yml@main
+    uses: quaternionmedia/.github/.github/workflows/black.yml@fix/ruff-check-and-python-input
